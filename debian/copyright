@@ -1,0 +1,32 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: rbfeeder
+Source: http://www.radarbox24.com
+
+Files: *
+Copyright: 2022 AirNav Systems <dev@airnavsystems.com>
+License: AIRNAV
+
+Files: debian/*
+Copyright: 2022 AirNav Systems <dev@airnavsystems.com>
+License: AIRNAV1.0
+
+License: AIRNAV1.0
+ This software includes precompiled version of some libraries in order
+ to work. These softwares are released under GPLv2 and BSD licenses and 
+ are available in these links:
+ .
+ librtlsdr - GPLv2 licensed Software Defined Radio library <
+ https://github.com/steve-m/librtlsdr>
+ dump1090 original - BSD licensed Mode-S Frame Demodulator/Decoder
+ <https://github.com/antirez/dump1090>
+ FlightAware dump1090-fa - GPLv2 <https://github.com/flightaware/dump1090>
+ dump1090-mutability - GPLv2 <https://github.com/mutability/dump1090>
+ rbfeeder source code <https://github.com/AirNav-Systems/rbfeeder>
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

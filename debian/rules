@@ -1,0 +1,48 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#DH_VERBOSE = 1
+
+# see EXAMPLES in dpkg-buildflags(1) and read /usr/share/dpkg/*
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+export DH_VERBOSE=10
+
+# debmake generated override targets
+# This is example for Cmake (See http://bugs.debian.org/641051 )
+#override_dh_auto_configure:
+#	dh_auto_configure -- \
+#	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
+
+override_dh_installinit:
+	dh_systemd_enable -prbfeeder --name=rbfeeder rbfeeder.service
+	dh_installinit -prbfeeder --no-start --noscripts
+#	dh_systemd_start -prbfeeder --no-restart-on-upgrade
+
+override_dh_install:
+	dh_install
+	install -d debian/rbfeeder/usr/bin	
+	cp -a rbfeeder debian/rbfeeder/usr/bin/rbfeeder
+	cp -a dump1090-rb debian/rbfeeder/usr/bin/dump1090-rb
+	mkdir -p debian/rbfeeder/etc
+	cp -a etc/rbfeeder.ini debian/rbfeeder/etc/rbfeeder.ini
+
+override_dh_systemd_start:
+	echo "Not running dh_systemd_start"
+
+
+override_dh_usrlocal:
+
+# main packaging script based on dh7 syntax
+%:
+	dh $@ --with=systemd,sysuser

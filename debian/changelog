@@ -1,0 +1,198 @@
+rbfeeder (1:1.0.6) stable; urgency=medium
+
+  * Bullseye release.
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Thu, 20 Jan 2022 12:04:38 +0300
+
+rbfeeder (1:1.0.5) stable; urgency=medium
+
+  * Fix systemd service command path. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Fri, 24 Sep 2021 17:28:00 +0100
+
+rbfeeder (1:1.0.4) stable; urgency=medium
+
+  * First multi-client generic release. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Fri, 24 Sep 2021 15:53:29 +0100
+
+rbfeeder (1:1.0.3) stable; urgency=medium
+
+  * First public-beta release. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Tue, 17 Aug 2021 19:39:14 +0100
+
+rbfeeder (1:1.0.1) stable; urgency=medium
+
+  * Version 1.0.1 release.  
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Mon, 26 Jul 2021 23:56:10 +0100
+
+rbfeeder (0.4.3-20210704004500) stable; urgency=medium
+
+  * Fix RAW connection to external dump1090.
+  * Add option to disable sending BEAST setting after external connection (send_beast_config=true).
+  * Add option for custom VHF Stream.
+  * Changed default PID file to /var/run/rbfeeder/rbfeeder.pid.
+  * Changed systemd service to run rbfeeder as non-privileged user (rbfeeder).
+  * Fix signal handler.
+  * Fix udev file for dongle access/permission.
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Sat, 03 Jul 2021 18:54:53 +0100
+
+rbfeeder (0.4.2-20210525101900) stable; urgency=medium
+
+  * Fixed integration with sharing keys
+
+ --  Nuno Covas <ncovas@airnavsystems.com>  Tue, 25 May 2021 10:18:49 +0100
+
+rbfeeder (0.4.1-20210414164500) stable; urgency=medium
+
+  * Added decoding/deriving of weather data from ADS-B messages
+
+ --  Nuno Covas <ncovas@airnavsystems.com>  Wed, 14 Apr 2021 16:45:14 +0100
+
+rbfeeder (0.4.0-20200715113500) stable; urgency=medium
+
+  * First release for this major version. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Wed, 15 Jul 2020 11:28:11 +0300
+
+rbfeeder (0.3.4-20200422191737) stable; urgency=medium
+
+  * Enable external data access by default for raspberry pi users.
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Wed, 22 Apr 2020 15:19:36 +0300
+
+rbfeeder (0.3.3-20200203195559) stable; urgency=medium
+
+  * Fix dump978-rb configuration. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Tue, 28 Jan 2020 07:54:11 +0300
+
+rbfeeder (0.3.2-20190831010517) stable; urgency=medium
+
+  * Fix CPU Serial in rpi-4.
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Sat, 31 Aug 2019 01:08:09 +0100
+
+rbfeeder (0.3.1-20190630002005) stable; urgency=medium
+
+  * First release with dump978 support. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Sun, 23 Jun 2019 23:34:40 +0100
+
+rbfeeder (0.3.0-20190504190233) stable; urgency=medium
+
+  * 0.3.0 Release. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Sat, 04 May 2019 15:37:10 +0100
+
+rbfeeder (0.2.19-20190301173658) stable; urgency=medium
+
+  * Fix Location issue with Map. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Tue, 26 Feb 2019 17:57:46 +0000
+
+rbfeeder (0.2.18-20190218202905) stable; urgency=medium
+
+  * Enable MLAT by default and some fix. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Mon, 18 Feb 2019 20:31:29 +0000
+
+rbfeeder (0.2.14-20190208173055) stable; urgency=medium
+
+  * New release.
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Fri, 08 Feb 2019 17:31:19 +0000
+
+rbfeeder (0.2.13-20190208131309) stable; urgency=medium
+
+  * Fix some issues related to JSON files in raspberry. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Fri, 08 Feb 2019 13:13:54 +0000
+
+rbfeeder (0.2.6-20180313082038) stable; urgency=low
+
+  * Release build. 
+
+ --  <pi@skyreceiver>  Tue, 13 Mar 2018 08:53:05 -0300
+
+rbfeeder (0.2.5-20180131174853) stable; urgency=low
+
+  * Release build.
+
+ --  <pi@raspberrypi>  Wed, 31 Jan 2018 17:50:30 +0000
+
+rbfeeder (0.2.5-20180131171059) stable; urgency=low
+
+  * Fix auto-update function and client type identification (RPi, ODroid, etc).
+
+ --  <pi@raspberrypi>  Wed, 31 Jan 2018 17:13:12 +0000
+
+rbfeeder (0.2.5-20180131012328) stable; urgency=low
+
+  * Latest version and features.
+
+ --  <pi@raspberrypi>  Wed, 31 Jan 2018 02:02:49 +0000
+
+rbfeeder (0.2.3-20170527202345) stable; urgency=low
+
+  * Fix connection issues. 
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Sat, 27 May 2017 20:25:48 +0000
+
+rbfeeder (0.2.2-20170524004446) stable; urgency=medium
+
+  * Fix in altitude reading and ground detection. 
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Wed, 24 May 2017 00:49:07 +0000
+
+rbfeeder (0.2.2-20170519170314) stable; urgency=low
+
+  * Improved communication and some minor fix. 
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Thu, 19 May 2017 14:54:47 +0000
+
+rbfeeder (0.2.1-20170427193721) stable; urgency=medium
+
+  * Fix memory leak and cpu usage. 
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Thu, 27 Apr 2017 19:34:25 +0000
+
+rbfeeder (0.2.0-20170426135630) stable; urgency=low
+
+  * Added statistics to communication. This will be used to show receiver
+    information in your account. 
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Wed, 26 Apr 2017 14:01:22 +0000
+
+rbfeeder (0.1.0-20170414183602) stable; urgency=low
+
+  * Changed server hostname.
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Fri, 14 Apr 2017 18:37:45 +0000
+
+rbfeeder (0.1.0-20170413205330) stable; urgency=low
+
+  * Closed some unused ports.
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Thu, 13 Apr 2017 20:54:41 +0000
+
+rbfeeder (0.1.0-20170412003211) stable; urgency=medium
+
+  * Added encryption between server and client.
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Wed, 12 Apr 2017 01:04:53 +0000
+
+rbfeeder (0.1.0-20170409195212) stable; urgency=low
+
+  * First release for beta-testers. 
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Sun, 09 Apr 2017 20:09:48 +0000
+
+rbfeeder (0.1.0) stable; urgency=low
+
+  * Initial Release.
+
+ -- Jonis Maurin Ceara <jceara@airnavsystems.com>  Sun, 02 Apr 2017 18:29:40 +0000

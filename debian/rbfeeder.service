@@ -1,0 +1,21 @@
+[Unit]
+Description=RBFeeder Service
+After=network-online.target
+
+[Service]
+Type=simple
+User=rbfeeder
+Group=rbfeeder
+PermissionsStartOnly=true
+ExecStartPre=+-/bin/mkdir /var/run/rbfeeder
+ExecStartPre=+-/bin/chown rbfeeder:rbfeeder /var/run/rbfeeder
+ExecStartPre=+-/bin/touch /var/log/rbfeeder.log
+ExecStartPre=+-/bin/chown rbfeeder:rbfeeder /var/log/rbfeeder.log
+ExecStartPre=+-/bin/chown rbfeeder:rbfeeder /etc/rbfeeder.ini
+ExecStartPre=+-/bin/setfacl -m u:www-data:rwx /etc/rbfeeder.ini
+ExecStart=/usr/bin/rbfeeder
+ExecStop=/bin/kill -TERM $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,212 @@
+syntax = "proto2";
+
+    enum AddrType {
+        ADDR_ADSB_ICAO = 0;       // Mode S or ADS-B, ICAO address, transponder sourced 
+        ADDR_ADSB_ICAO_NT = 1;    // ADS-B, ICAO address, non-transponder 
+        ADDR_ADSR_ICAO = 2;       // ADS-R, ICAO address 
+        ADDR_TISB_ICAO = 3;       // TIS-B, ICAO address 
+        ADDR_ADSB_OTHER = 4;      // ADS-B, other address format 
+        ADDR_ADSR_OTHER = 5;      // ADS-R, other address format 
+        ADDR_TISB_TRACKFILE = 6;  // TIS-B, Mode A code + track file number 
+        ADDR_TISB_OTHER = 7;      // TIS-B, other address format 
+        ADDR_MODE_A = 8;          // Mode A
+        ADDR_UNKNOWN = 9;         // unknown address format
+    }
+
+enum SilType {
+    SIL_INVALID = 0;
+    SIL_UNKNOWN = 1;
+    SIL_PER_SAMPLE = 2;
+    SIL_PER_HOUR = 3;
+}
+
+message FlightData {
+    required int32 addr = 1; // ModeS Address
+    optional AddrType addr_type = 2; // ModeS Address
+    optional string callsign = 3; // Callsign
+    optional int32 altitude = 4; // Altitude
+    optional int32 altitude_source = 5;
+    optional double latitude = 6;
+    optional double longitude = 7;
+    optional int32 heading = 8;
+    optional int32 gnd_speed = 9;
+    optional int32 ias = 10;
+    optional sint32 vert_rate = 11;
+    optional int32 squawk = 12;
+    optional bool airborne = 13;
+    optional bool is_mlat = 14;
+    optional bool is_978 = 15;
+
+    // NAV
+    optional int32 nav_altitude_fms = 16;
+    optional int32 nav_altitude_mcp = 17;
+    optional int32 nav_qnh = 18;
+    optional int32 nav_heading = 19;
+    optional int32 nav_altitude_src = 20;
+    optional bool nav_modes_autopilot = 21;
+    optional bool nav_modes_vnav = 22;
+    optional bool nav_modes_alt_hold = 23;
+    optional bool nav_modes_approach = 24;
+    optional bool nav_modes_lnav = 25;
+    optional bool nav_modes_tcas = 26;
+
+    // Weather
+    optional int32 wind_dir = 27;
+    optional int32 wind_speed = 28;
+    optional sint32 temperature = 29;
+    reserved 30 to 34;
+
+    optional uint32 pos_nic                     = 35; // NIC
+    optional bool nic_baro                      = 36; // NIC baro
+    optional uint32 nac_p                       = 37; // NAC p
+    optional uint32 nac_v                       = 38; // NAC v
+    optional uint32 sil                         = 39; // SIL
+    optional SilType sil_type                   = 40; // SIL Type
+    
+
+
+
+}
+
+message FlightPacket {
+    repeated FlightData fdata = 1;    
+}
+
+enum ClientType {
+        RPI             = 0;
+        RBCS            = 1;
+        RBLC            = 2;
+        RBLC2           = 3;        
+        OTHER           = 4;
+        PC_X86          = 5;
+        PC_X64          = 6;
+        GENERIC_ARM_32  = 7;
+        GENERIC_ARM_64  = 8;
+}
+
+message AuthFeeder {
+    
+    required string sk                  =   1; // Sharing-key    
+    required ClientType client_type     =   2; // Client-type
+    optional uint64 client_version      =   3; // Client version
+    optional string serial              =   4; // Client Serial
+}
+
+message ServerReply {
+    enum ReplyStatus {
+        NOTOK = 0;
+        OK = 1;        
+        ERROR = 2;
+        OTHER = 3;
+        AUTH_OK = 4;
+        AUTH_ERROR = 5;
+        SK_CREATE_OK = 6;
+        SK_CREATE_ERROR = 7;
+        AUTH_INTERNAL_ERROR = 8;
+        AUTH_CLIENT_MIN_VERSION_ERROR = 9;
+      }
+    required ReplyStatus status = 1; // Server return status
+    optional string error_text = 2; // Error text
+    optional int32 id = 3; // ID of packet
+    optional string sk = 4; // Sharing-key
+    optional string sn = 5;  // Station SN
+    optional uint64 time = 6;
+    optional ClientType client_type = 7;
+}
+
+message PingPong {
+    required int32 ping_id = 1; // Ping ID
+}
+
+message SysInformation {
+    required string sysname = 1;
+    optional string nodename = 2;
+    optional string release = 3;
+    optional string version = 4;
+    optional string machine = 5;
+}
+
+message ClientStats {
+    optional uint64 samples_processed               = 1;
+    optional uint64 messages_total                  = 2;
+    optional uint64 unique_aircraft                 = 3;
+    optional uint64 single_message_aircraft         = 4;
+    optional float  cpu_load                        = 5;
+    
+    // RBCSRBLC
+    optional uint64 remote_accepted                 = 6;
+    optional uint64 remote_received_modeac          = 7;
+    optional uint64 remote_received_modes           = 8;
+    optional uint64 remote_rejected_bad             = 9;
+    optional uint64 remote_rejected_unknown_icao    = 10;
+    optional bool net_mode                          = 11;
+    optional float cpu_temp                         = 12;
+    optional float pmu_temp                         = 13;
+    optional bool  vhf_running                      = 14;
+    optional bool  mlat_running                     = 15;
+    optional bool  dump978_running                  = 16;
+    optional bool  acars_running                    = 17;
+}
+
+message RequestSK {
+    required ClientType client_type = 1;
+    optional string     serial      = 2;
+}
+
+
+// Control command
+enum CommandType {
+        CTR_OTHER                                   = 0;
+        SET_LOCATION                                = 1; // Set lat/lon/alt
+        SET_MLAT_COMMAND                            = 2; // Set MLAT command
+        SET_MLAT_AUTO_START_ON                      = 3; // Set MLAT Auto-start on
+        SET_MLAT_AUTO_START_OFF                     = 4; // Set MLAT Auto-start off
+        START_MLAT                                  = 5; // Start MLAT
+        STOP_MLAT                                   = 6; // Stop MLAT
+        SET_VHF_AUTO_START_ON                       = 7; // Set VHF Auto-start on
+        SET_VHF_AUTO_START_OFF                      = 8; // Set VHF Auto-start off
+        START_VHF                                   = 9; // Start VHF
+        STOP_VHF                                    = 10; // Stop VHF
+        SET_VHF_COMMAND                             = 11; // Set VHF command
+        SET_VHF_FREQS                               = 12; // Set VHF Frequencies
+        SET_VHF_SQUELCH                             = 13; // Set VHF Squelch
+        SET_VHF_GAIN                                = 14; // Set VHF Gain
+        SET_VHF_DEVICE                              = 15; // Set VHF Device
+        RUN_RF_SURVEY                               = 16; // Run RF Survey
+        START_ACARS                                 = 17; // Start ACARS
+        STOP_ACARS                                  = 18; // Stop ACARS
+        SET_ACARS_COMMAND                           = 19; // Set ACARS CMD
+        SET_ACARS_DEVICE                            = 20; // Set ACARS Device
+        SET_ACARS_FREQS                             = 21; // Set ACARS Frequencies
+        SET_ACARS_SERVER                            = 22; // Set ACARS Server
+        SET_MLAT_SERVER                             = 23; // Set MLAT Server
+        SET_DUMP_PPM_ERROR                          = 24;
+        SET_DUMP_DEVICE                             = 25;
+        SET_DUMP_GAIN                               = 26;
+        SET_DUMP_AGC                                = 27;
+        SET_DUMP_DC_FILTER                          = 28;
+        SET_DUMP_FIX                                = 29;
+        SET_DUMP_CHECK_CRC                          = 30;
+        SET_DUMP_MODE_AC                            = 31;
+        SET_ACARS_AUTO_START_ON                     = 32;
+        SET_ACARS_AUTO_START_OFF                    = 33;
+        RESTART_DUMP                                = 34; // Restart dump1090
+        RESTART_MLAT                                = 35; // Restart MLAT
+        RESTART_VHF                                 = 36; // Restart VHF
+        RESTART_ACARS                               = 37; // Restart ACARS
+        SET_ADAPTIVE_BURST                          = 38; // Adaptive Burst
+        SET_ADAPTIVE_RANGE                          = 39; // Adaptive Range
+
+    }
+
+
+message ControlCommand {
+    required CommandType type                       = 1; // Command type
+    optional double latitude                        = 2; // Latitude
+    optional double longitude                       = 3; // Longitude
+    optional sint32 altitude                        = 4; // Altitude
+    optional string value                           = 5; // Generic value
+    optional double min_freq                        = 6; // Min frequency for RF Survey
+    optional double max_freq                        = 7; // Max frequency for RF Survey
+    optional uint32 device                          = 8; // Device number    
+}
