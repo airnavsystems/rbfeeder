@@ -63,9 +63,7 @@ message FlightData {
     optional uint32 sil                         = 39; // SIL
     optional SilType sil_type                   = 40; // SIL Type
     
-
-
-
+    optional int32 altitude_geo                = 41; // Altitude Geometric
 }
 
 message FlightPacket {

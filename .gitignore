@@ -22,3 +22,8 @@ starch-benchmark
 wisdom.local
 nbproject
 nbproject/*
+cprtests
+debian/rbfeeder.debhelper.log
+debian/files
+debian/*.debhelper
+debian/debhelper-build-stamp

@@ -13,7 +13,7 @@
  * Load configuration from ini file
  */
 void airnav_loadConfig(int argc, char **argv) {
-    
+
     char tmp_str[7] = {0};
     char* endptr = "0123456789";
     int j = 0;
@@ -387,7 +387,7 @@ void airnav_loadConfig(int argc, char **argv) {
     if (dump_gain != -10) {
         Modes.gain = (int) ((double) dump_gain * (double) 10);
     }
-    
+
     dump_agc = ini_getBoolean(configuration_file, "client", "dump_agc", 0);
     Modes.nfix_crc = ini_getBoolean(configuration_file, "client", "dump_fix", 1);
     Modes.mode_ac = ini_getBoolean(configuration_file, "client", "dump_mode_ac", 1);
@@ -405,7 +405,7 @@ void airnav_loadConfig(int argc, char **argv) {
     if (ini_hasSection(configuration_file, "vhf") == 1) {
         // VHF
         loadVhfConfig();
-        
+
         // Force create of VHF config
         if (generateVHFConfig() == 0) {
             airnav_log("Error creating VHF configuration. Check permissions.\n");
@@ -682,7 +682,7 @@ void airnav_init_mutex(void) {
         exit(EXIT_FAILURE);
     }
 
-    
+
     /*
      * Cmd Mutex
      */
@@ -699,7 +699,7 @@ void airnav_init_mutex(void) {
     //    exit(EXIT_FAILURE);
     //}
 
-    
+
 
 
     airnav_create_thread();
@@ -1211,90 +1211,100 @@ void *airnav_prepareData(void *arg) {
                     }
 
 
-                } else if (Modes.use_gnss && trackDataValid(&b->altitude_geom_valid)) {
-                    if (trackDataAge(&b->altitude_geom_valid) <= AIRNAV_MAX_ITEM_AGE) {
+                } else {
 
-                        if (((tv.tv_sec - b->an.rpisrv_emitted_altitude_geom_time) >= MAX_TIME_FIELD_ALTITUDE) || (b->an.rpisrv_emitted_altitude_geom != b->altitude_geom) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
-                            b->an.rpisrv_emitted_altitude_geom_time = tv.tv_sec;
-                            b->an.rpisrv_emitted_altitude_geom = b->altitude_geom;
 
-                            if (b->altitude_geom > 0) {
-                                if (((tv.tv_sec - b->an.rpisrv_emitted_airborne_time) >= MAX_TIME_FIELD_AIRBORNE) || (b->an.rpisrv_emitted_airborne != 1) || force_send == 1) { // Send only once every X seconds (or when data changed)
-                                    b->an.rpisrv_emitted_airborne = 1;
-                                    b->an.rpisrv_emitted_airborne_time = tv.tv_sec;
+                    if (Modes.use_gnss && trackDataValid(&b->altitude_geom_valid)) {
+                        if (trackDataAge(&b->altitude_geom_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
-                                    acf->airborne = 1;
-                                    acf->airborne_set = 1;
-                                    // ANRB
-                                    acf2->airborne = 1;
-                                    acf2->airborne_set = 1;
+                            if (((tv.tv_sec - b->an.rpisrv_emitted_altitude_geom_time) >= MAX_TIME_FIELD_ALTITUDE) || (b->an.rpisrv_emitted_altitude_geom != b->altitude_geom) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
+                                b->an.rpisrv_emitted_altitude_geom_time = tv.tv_sec;
+                                b->an.rpisrv_emitted_altitude_geom = b->altitude_geom;
+
+                                if (b->altitude_geom > 0) {
+                                    if (((tv.tv_sec - b->an.rpisrv_emitted_airborne_time) >= MAX_TIME_FIELD_AIRBORNE) || (b->an.rpisrv_emitted_airborne != 1) || force_send == 1) { // Send only once every X seconds (or when data changed)
+                                        b->an.rpisrv_emitted_airborne = 1;
+                                        b->an.rpisrv_emitted_airborne_time = tv.tv_sec;
+
+                                        acf->airborne = 1;
+                                        acf->airborne_set = 1;
+                                        // ANRB
+                                        acf2->airborne = 1;
+                                        acf2->airborne_set = 1;
+                                    }
                                 }
+                                acf->altitude_geo = b->altitude_geom;
+                                acf->altitude_geo_set = 1;
+                                // ANRB
+                                acf2->altitude_geo = b->altitude_geom;
+                                acf2->altitude_geo_set = 1;
+                                send = 1;
+                                airnav_log_level(4, "[%06X] Sending altitude_geom...%d\n", (b->addr & 0xffffff), b->altitude_geom);
+                            } else {
+                                airnav_log_level(4, "[%06X] Altitude (geom) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_AIRBORNE, b->an.rpisrv_emitted_altitude_geom);
                             }
-                            acf->altitude = b->altitude_geom;
-                            acf->altitude_set = 1;
-                            // ANRB
-                            acf2->altitude = b->altitude_geom;
-                            acf2->altitude_set = 1;
-                            send = 1;
-                            airnav_log_level(4, "[%06X] Sending altitude_geom...%d\n", (b->addr & 0xffffff), b->altitude_geom);
-                        } else {
-                            airnav_log_level(4, "[%06X] Altitude (geom) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_AIRBORNE, b->an.rpisrv_emitted_altitude_geom);
+
+
+                            // Asterix
+                            if (asterix_enabled == 1 && cat21_loaded == 1) {
+                                cat021_setGeometricHeight(packet, cat21items, (b->altitude_geom / 100));
+                            }
+
+
+
+
                         }
-
-
-                        // Asterix
-                        if (asterix_enabled == 1 && cat21_loaded == 1) {
-                            cat021_setGeometricHeight(packet, cat21items, (b->altitude_geom / 100));
-                        }
-
-
-
-
                     }
-                } else if (trackDataValid(&b->altitude_baro_valid)) {
-
-                    if (trackDataAge(&b->altitude_baro_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
 
-                        if (((tv.tv_sec - b->an.rpisrv_emitted_altitude_baro_time) >= MAX_TIME_FIELD_ALTITUDE) || (b->an.rpisrv_emitted_altitude_baro != b->altitude_baro) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
+                    // Altitude barometric
+                    if (trackDataValid(&b->altitude_baro_valid)) {
 
-                            // Update send time and value
-                            b->an.rpisrv_emitted_altitude_baro_time = tv.tv_sec;
-                            b->an.rpisrv_emitted_altitude_baro = b->altitude_baro;
+                        if (trackDataAge(&b->altitude_baro_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
-                            if (b->altitude_baro > 0) {
-                                if (((tv.tv_sec - b->an.rpisrv_emitted_airborne_time) >= MAX_TIME_FIELD_AIRBORNE) || (b->an.rpisrv_emitted_airborne != 1) || force_send == 1) { // Send only once every X seconds (or when data changed)
-                                    b->an.rpisrv_emitted_airborne = 1;
-                                    b->an.rpisrv_emitted_airborne_time = tv.tv_sec;
-                                    acf->airborne = 1;
-                                    acf->airborne_set = 1;
-                                    // ANRB
-                                    acf2->airborne = 1;
-                                    acf2->airborne_set = 1;
+
+                            if (((tv.tv_sec - b->an.rpisrv_emitted_altitude_baro_time) >= MAX_TIME_FIELD_ALTITUDE) || (b->an.rpisrv_emitted_altitude_baro != b->altitude_baro) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
+
+                                // Update send time and value
+                                b->an.rpisrv_emitted_altitude_baro_time = tv.tv_sec;
+                                b->an.rpisrv_emitted_altitude_baro = b->altitude_baro;
+
+                                if (b->altitude_baro > 0) {
+                                    if (((tv.tv_sec - b->an.rpisrv_emitted_airborne_time) >= MAX_TIME_FIELD_AIRBORNE) || (b->an.rpisrv_emitted_airborne != 1) || force_send == 1) { // Send only once every X seconds (or when data changed)
+                                        b->an.rpisrv_emitted_airborne = 1;
+                                        b->an.rpisrv_emitted_airborne_time = tv.tv_sec;
+                                        acf->airborne = 1;
+                                        acf->airborne_set = 1;
+                                        // ANRB
+                                        acf2->airborne = 1;
+                                        acf2->airborne_set = 1;
+                                    }
                                 }
+                                acf->altitude = b->altitude_baro;
+                                acf->altitude_set = 1;
+                                // ANRB
+                                acf2->altitude = b->altitude_baro;
+                                acf2->altitude_set = 1;
+                                send = 1;
+
+
+                                airnav_log_level(4, "[%06X] Sending altitude_baro...%d\n", (b->addr & 0xffffff), b->altitude_baro);
+
+                            } else {
+                                airnav_log_level(4, "[%06X] Altitude (baro) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_ALTITUDE, b->altitude_baro);
                             }
-                            acf->altitude = b->altitude_baro;
-                            acf->altitude_set = 1;
-                            // ANRB
-                            acf2->altitude = b->altitude_baro;
-                            acf2->altitude_set = 1;
-                            send = 1;
 
+                            // Asterix
+                            if (asterix_enabled == 1 && cat21_loaded == 1) {
+                                cat021_setFlightLevel(packet, cat21items, (b->altitude_baro / 100));
+                            }
 
-                            airnav_log_level(4, "[%06X] Sending altitude_baro...%d\n", (b->addr & 0xffffff), b->altitude_baro);
-
-                        } else {
-                            airnav_log_level(4, "[%06X] Altitude (baro) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_ALTITUDE, b->altitude_baro);
                         }
-
-                        // Asterix
-                        if (asterix_enabled == 1 && cat21_loaded == 1) {
-                            cat021_setFlightLevel(packet, cat21items, (b->altitude_baro / 100));
-                        }
-
                     }
+
+
                 }
-
+                                
                 // Position
                 if (trackDataAge(&b->position_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1868,20 +1878,21 @@ void *airnav_prepareData(void *arg) {
 //
 // Return a description of the receiver in json.
 //
+
 char *airnav_generateStatusJson(const char *url_path, int *len) {
-    
+
     char *buf = (char *) malloc(1024), *p = buf;
     //int history_size;
 
     MODES_NOTUSED(url_path);
     char *myip = net_getLocalIp();
-    
+
     double pmu_temp = 0;
-    
+
 #ifdef RBCSRBLC
     pmu_temp = getPMUTemp();
 #endif
-    
+
     p += sprintf(p, "{" \
                  "\"rbfeeder\" : 1,"
             "\"vhf\": %d,"
@@ -1912,15 +1923,15 @@ char *airnav_generateStatusJson(const char *url_path, int *len) {
             "\"sats_used\" : %d, "
             "\"connected\": %d,"
             "\"version\": \"%s\", "
-            "\"build_date\": \"%s\"",            
-            checkVhfRunning(),mlat_checkMLATRunning(),acars_checkACARSRunning(),vhf_mode,vhf_freqs,vhf_gain,vhf_squelch,vhf_correction,vhf_afc,autostart_vhf,autostart_mlat,myip,mac_a,g_lat,g_lon,g_alt,start_datetime,sn,
-            pmu_temp, getCPUTemp(),0.0,max_cpu_temp, 0, 0, 0, 0, airnav_com_inited, MODES_DUMP1090_VERSION, BDTIME);
+            "\"build_date\": \"%s\"",
+            checkVhfRunning(), mlat_checkMLATRunning(), acars_checkACARSRunning(), vhf_mode, vhf_freqs, vhf_gain, vhf_squelch, vhf_correction, vhf_afc, autostart_vhf, autostart_mlat, myip, mac_a, g_lat, g_lon, g_alt, start_datetime, sn,
+            pmu_temp, getCPUTemp(), 0.0, max_cpu_temp, 0, 0, 0, 0, airnav_com_inited, MODES_DUMP1090_VERSION, BDTIME);
 
-    
+
     p += sprintf(p, "}\n");
 
-    *len = (p - buf);    
-    free(myip);    
+    *len = (p - buf);
+    free(myip);
     return buf;
-   
+
 }

@@ -397,7 +397,7 @@ int main(int argc, char **argv) {
 
     MODES_NOTUSED(argc);
     MODES_NOTUSED(argv);
-
+	
     start_datetime[0] = '\0';
     // application start date/time
     time_t t = time(NULL);

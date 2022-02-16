@@ -1,6 +1,6 @@
 PROGNAME=dump1090-rb
 
-DUMP1090_VERSION ?= 1.0.6
+DUMP1090_VERSION ?= 1.0.7
 
 AIRNAV_TYPE ?= generic
 BUILD_DATETIME ?= $(shell date +'%Y%m%d%H%M00')

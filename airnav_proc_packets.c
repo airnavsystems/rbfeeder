@@ -340,6 +340,11 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
             subs[i]->altitude = flights->packet->altitude;
             subs[i]->has_altitude = 1;
         }
+        
+        if (flights->packet->altitude_geo_set == 1) {            
+            subs[i]->altitude_geo = flights->packet->altitude_geo;
+            subs[i]->has_altitude_geo = 1;
+        }
 
         if (flights->packet->position_set == 1) {
             subs[i]->latitude = flights->packet->lat;
@@ -461,27 +466,33 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
     fpacket.fdata = subs;
 
     len = flight_packet__get_packed_size(&fpacket);
-    buf = malloc(len); // Allocate memory     
-    flight_packet__pack(&fpacket, buf);
-    struct prepared_packet *packet = malloc(sizeof (struct prepared_packet));
-    packet->buf = buf;
-    packet->len = len;
-    packet->type = FLIGHT_PACKET;
-        
     
-    if (net_send_packet(packet) == 1 ) {
-        // Increase packet counter
-        pthread_mutex_lock(&m_packets_counter);
-        if (number_of_flights > 1) {
-            packets_total = packets_total + (number_of_flights - 1);
-            packets_last = packets_last + (number_of_flights - 1);
-        } else {
-            packets_total = packets_total + number_of_flights;
-            packets_last = packets_last + number_of_flights;
-        }
-        pthread_mutex_unlock(&m_packets_counter);
-    }
+    
+    if (airnav_com_inited == 1) {
 
+        buf = malloc(len); // Allocate memory     
+        flight_packet__pack(&fpacket, buf);
+        
+        struct prepared_packet *packet = malloc(sizeof (struct prepared_packet));
+        packet->buf = buf;
+        packet->len = len;
+        packet->type = FLIGHT_PACKET;
+
+        if (net_send_packet(packet) == 1 ) {
+            // Increase packet counter
+            pthread_mutex_lock(&m_packets_counter);
+            if (number_of_flights > 1) {
+                packets_total = packets_total + (number_of_flights - 1);
+                packets_last = packets_last + (number_of_flights - 1);
+            } else {
+                packets_total = packets_total + number_of_flights;
+                packets_last = packets_last + number_of_flights;
+            }
+            pthread_mutex_unlock(&m_packets_counter);
+        }
+
+    }
+    
 
     for (i = 0; i < qtd; i++){
         if (subs[i]->callsign != NULL) {

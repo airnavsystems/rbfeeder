@@ -142,10 +142,10 @@ void net_enable_keepalive(int sock) {
     timeout.tv_usec = 0;
 
     if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *) &timeout, sizeof (timeout)) < 0)
-        airnav_log("Error: setsockopt failed\n");
+        airnav_log("Error: setsockopt failed for SO_RCVTIMEO (sock: %d)\n", sock);
 
     if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *) &timeout, sizeof (timeout)) < 0)
-        airnav_log("Error: setsockopt failed\n");
+        airnav_log("Error: setsockopt failed for SO_SNDTIMEO (sock: %d)\n", sock);
 
 
 }
@@ -342,7 +342,7 @@ int net_send_packet(struct prepared_packet *packet) {
     // +1 is for the type of message that is not calculated before
     size[0] = (packet->len + 1) >> 8;
     size[1] = (packet->len + 1) & 0x00ff;
-
+    
     if (packet->type == PINGPONG) {
         airnav_log_level(5, "Sending ping packet.\n");
     }

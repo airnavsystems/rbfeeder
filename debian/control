@@ -9,7 +9,7 @@ Vcs-Git: https://github.com/AirNav-Systems/rbfeeder
 Vcs-Browser: https://github.com/AirNav-Systems/rbfeeder
 
 Package: rbfeeder
-Architecture: armhf
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, systemd, dh-sysuser
 Description: Software for uploading ADS-B data to RadarBox24.com
  This software is used for sending ADS-B data to RadarBox24.com

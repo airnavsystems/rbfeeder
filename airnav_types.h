@@ -33,6 +33,8 @@ extern "C" {
         short callsign_set;
         int32_t altitude;
         short altitude_set;
+        int32_t altitude_geo;
+        short altitude_geo_set;
         double lat;
         double lon;
         short position_set;
