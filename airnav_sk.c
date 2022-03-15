@@ -31,8 +31,8 @@ int sendKey(void) {
             memset(cserial, 0, 60);
             sprintf(cserial, "%016llx", cpuserial);
         } else {
-            airnav_log("CPU Serial empty.\n");
-            return 0;
+            cserial = net_get_mac_address(0);
+            airnav_log("CPU Serial empty. Use MAC address instead.\n");
         }
     } else if (client_type == CLIENT_TYPE__PC_X64 || client_type == CLIENT_TYPE__PC_X86) {
         cserial = net_get_mac_address(0);
@@ -105,7 +105,8 @@ int sendKeyRequest(void) {
             memset(cserial, 0, 60);
             sprintf(cserial, "%016llx", cpuserial);
         } else {
-            airnav_log("CPU Serial empty.\n");
+            cserial = net_get_mac_address(0);
+            airnav_log("CPU Serial empty. Use MAC address instead.\n");
         }
 
     } else if (client_type == CLIENT_TYPE__PC_X64 || client_type == CLIENT_TYPE__PC_X86) {
