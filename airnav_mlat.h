@@ -26,6 +26,7 @@ extern "C" {
     extern char *mlat_pidfile;
     extern int autostart_mlat;
     extern char *mlat_config;
+    extern char *mlat_input_type;
 
     
     

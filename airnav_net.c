@@ -603,6 +603,15 @@ struct p_data *net_preparePacket_v2(void) {
 
     pakg->c_type = getClientType();
 
+    pakg->gnd_speed_full = 0;
+    pakg->gnd_speed_full_set = 0;
+    pakg->vert_rate_full = 0;
+    pakg->vert_rate_full_set = 0;
+    pakg->ias_full = 0;
+    pakg->ias_full_set = 0;    
+    pakg->heading_full = 0;
+    pakg->heading_full_set = 0;
+    
     return pakg;
 }
 

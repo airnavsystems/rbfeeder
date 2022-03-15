@@ -15,6 +15,7 @@ char *mlat_server;
 char *mlat_pidfile;
 int autostart_mlat;
 char *mlat_config;
+char *mlat_input_type;
 
 /*
  * Check if MLAT is running
@@ -53,7 +54,7 @@ void mlat_startMLAT(void) {
         char *tmp_cmd = malloc(300);
         memset(tmp_cmd, 0, 300);
 
-        sprintf(tmp_cmd, "%s --input-type dump1090 --input-connect 127.0.0.1:%s --server %s --lat %f --lon %f --alt %d --user %s --results beast,connect,127.0.0.1:%s", mlat_cmd, beast_out_port, mlat_server, g_lat, g_lon, g_alt, sn, beast_in_port);
+        sprintf(tmp_cmd, "%s --input-type %s --input-connect 127.0.0.1:%s --server %s --lat %f --lon %f --alt %d --user %s --results beast,connect,127.0.0.1:%s", mlat_cmd, mlat_input_type, beast_out_port, mlat_server, g_lat, g_lon, g_alt, sn, beast_in_port);
 
         airnav_log_level(3, "Starting MLAT with this command: '%s'\n", tmp_cmd);
 

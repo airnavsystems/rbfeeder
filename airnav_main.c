@@ -422,6 +422,8 @@ void airnav_loadConfig(int argc, char **argv) {
 
     }
 
+    ini_getString(&mlat_input_type, configuration_file, "mlat", "input_type", "dump1090");
+    
 
     // dump1090-rb
     ini_getString(&dumprb_cmd, configuration_file, "client", "dumprb_cmd", NULL);
@@ -1342,9 +1344,13 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_mag_heading_time = tv.tv_sec;
                         b->an.rpisrv_emitted_mag_heading = (b->mag_heading / 10);
 
-                        if (trackDataValid(&b->mag_heading_valid)) {
-                            acf->heading = (b->mag_heading / 10);
-                            acf->heading_set = 1;
+                        if (trackDataValid(&b->mag_heading_valid)) {                                                       
+                            //acf->heading = (b->mag_heading / 10);                                                        
+                            //acf->heading_set = 1;
+                                                        
+                            acf->heading_full = b->mag_heading;
+                            acf->heading_full_set = 1;                                                        
+                            
                             // ANRB
                             acf2->heading = (b->mag_heading / 10);
                             acf2->heading_set = 1;
@@ -1529,10 +1535,14 @@ void *airnav_prepareData(void *arg) {
                         // Update values
                         b->an.rpisrv_emitted_gs_time = tv.tv_sec;
                         b->an.rpisrv_emitted_gs = (b->gs / 10);
+                        
 
                         if (trackDataValid(&b->gs_valid)) {
-                            acf->gnd_speed = (b->gs / 10);
-                            acf->gnd_speed_set = 1;
+                            //acf->gnd_speed = (b->gs / 10);
+                            acf->gnd_speed_full = b->gs;
+                            //acf->gnd_speed_set = 1;
+                            acf->gnd_speed_full_set = 1;                                                        
+                            
                             // ANRB
                             acf2->gnd_speed = (b->gs / 10);
                             acf2->gnd_speed_set = 1;
@@ -1555,8 +1565,12 @@ void *airnav_prepareData(void *arg) {
                             b->an.rpisrv_emitted_geom_rate = (b->geom_rate / 10);
                             b->an.rpisrv_emitted_geom_rate_time = tv.tv_sec;
 
-                            acf->vert_rate = (b->geom_rate / 10);
-                            acf->vert_rate_set = 1;
+                            //acf->vert_rate = (b->geom_rate / 10);
+                            //acf->vert_rate_set = 1;
+                            
+                            acf->vert_rate_full = b->geom_rate;
+                            acf->vert_rate_full_set = 1;
+                            
                             // ANRB
                             acf2->vert_rate = (b->geom_rate / 10);
                             acf2->vert_rate_set = 1;
@@ -1574,8 +1588,12 @@ void *airnav_prepareData(void *arg) {
                             b->an.rpisrv_emitted_baro_rate = (b->baro_rate / 10);
                             b->an.rpisrv_emitted_baro_rate_time = tv.tv_sec;
 
-                            acf->vert_rate = (b->baro_rate / 10);
-                            acf->vert_rate_set = 1;
+                            //acf->vert_rate = (b->baro_rate / 10);
+                            //acf->vert_rate_set = 1;
+                            
+                            acf->vert_rate_full = b->baro_rate;
+                            acf->vert_rate_full_set = 1;
+                            
                             // ANRB
                             acf2->vert_rate = (b->baro_rate / 10);
                             acf2->vert_rate_set = 1;
@@ -1620,8 +1638,12 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_ias = (b->ias / 10);
                         b->an.rpisrv_emitted_ias_time = tv.tv_sec;
 
-                        acf->ias = (b->ias / 10);
-                        acf->ias_set = 1;
+                        //acf->ias = (b->ias / 10);
+                        //acf->ias_set = 1;
+                        
+                        acf->ias_full = b->ias;
+                        acf->ias_full_set = 1;
+                        
                         // ANRB
                         acf2->ias = (b->ias / 10);
                         acf2->ias_set = 1;

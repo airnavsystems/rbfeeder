@@ -454,6 +454,27 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
             subs[i]->has_sil_type = 1;            
         }
         
+        if (flights->packet->gnd_speed_full_set == 1) {
+            subs[i]->gnd_speed_full = flights->packet->gnd_speed_full;
+            subs[i]->has_gnd_speed_full = 1;
+        }
+        
+        if (flights->packet->vert_rate_full_set == 1) {
+            subs[i]->vert_rate_full = flights->packet->vert_rate_full;
+            subs[i]->has_vert_rate_full = 1;
+        }
+        
+        if (flights->packet->ias_full_set == 1) {
+            subs[i]->ias_full = flights->packet->ias_full;
+            subs[i]->has_ias_full = 1;
+        }
+        
+        if (flights->packet->heading_full_set == 1) {                        
+            subs[i]->heading_full = flights->packet->heading_full;
+            subs[i]->has_heading_full = 1;
+        }
+        
+        
         free(flights->packet);
         struct packet_list *old = flights;
         flights = flights->next;

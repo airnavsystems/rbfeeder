@@ -61,9 +61,14 @@ message FlightData {
     optional uint32 nac_p                       = 37; // NAC p
     optional uint32 nac_v                       = 38; // NAC v
     optional uint32 sil                         = 39; // SIL
-    optional SilType sil_type                   = 40; // SIL Type
-    
-    optional int32 altitude_geo                = 41; // Altitude Geometric
+    optional SilType sil_type                   = 40; // SIL Type    
+    optional int32 altitude_geo                 = 41; // Altitude Geometric
+
+    optional double gnd_speed_full              = 42; // Ground speed - Full value
+    optional sint32 vert_rate_full              = 43; // Vertical rate - Full value
+    optional uint32 ias_full                    = 44; // IAS - Full value 
+    optional double heading_full                = 45; // Heading - Full
+
 }
 
 message FlightPacket {
@@ -80,6 +85,7 @@ enum ClientType {
         PC_X64          = 6;
         GENERIC_ARM_32  = 7;
         GENERIC_ARM_64  = 8;
+        RBLC3           = 9;
 }
 
 message AuthFeeder {
