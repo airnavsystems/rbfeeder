@@ -17,6 +17,27 @@ char *dump978_soapy_params;
 
 pthread_t t_dump978;
 
+void uat_loadUatConfig(void) {
+    ini_getString(&dump978_cmd, configuration_file, "dump978", "dump978_cmd", NULL);
+    if (dump978_cmd == NULL) {
+
+        airnav_log_level(3, "No 978 cmd defined! Let's try default....\n");
+        if (file_exist("/usr/bin/dump978-rb")) {
+            ini_getString(&dump978_cmd, configuration_file, "dump978", "dump978_cmd", "/usr/bin/dump978-rb");
+            dump978_enabled = ini_getBoolean(configuration_file, "dump978", "dump978_enabled", 1);
+        } else {
+            airnav_log_level(3, "No 978 binary found\n");
+            dump978_enabled = ini_getBoolean(configuration_file, "dump978", "dump978_enabled", 0);
+        }
+
+    } else {
+        dump978_enabled = ini_getBoolean(configuration_file, "dump978", "dump978_enabled", 1);
+    }
+
+
+    autostart_978 = ini_getBoolean(configuration_file, "dump978", "autostart_dump978", 0);    
+}
+
 /*
  * Check if dump978 is running
  */

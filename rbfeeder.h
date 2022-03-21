@@ -37,6 +37,7 @@
 #include "net_io.h"
 #include "airnav_anrb.h"
 #include "airnav_geomag.h"
+#include "airnav_scom.h"
 
 
 #ifdef __cplusplus
@@ -129,9 +130,12 @@ extern "C" {
     extern pthread_t t_statistics;
     extern pthread_t t_stats;
     extern pthread_t t_send_data;
+    extern pthread_t t_serial_data;
     extern pthread_t t_prepareData;
     extern double max_cpu_temp;
     extern ClientType c_type;
+    extern char *serial_device;
+    extern int32_t serial_speed;
 
 
     void receiverPositionChanged(float lat, float lon, float alt);

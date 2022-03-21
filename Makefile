@@ -203,7 +203,7 @@ dump1090-rb: dump1090.o anet.o interactive.o mode_ac.o mode_s.o comm_b.o net_io.
 	$(CC) -g -o $@ $^ $(LDFLAGS) $(LIBS) $(LIBS_SDR) $(LIBS_CURSES)
 
 
-rbfeeder: airnav_geomag.o airnav_anrb.o airnav_uat.o airnav_dumprb.o airnav_acars.o airnav_mlat.o airnav_vhf.o airnav_cmd.o airnav_proc_packets.o airnav_sk.o airnav_net.o airnav_asterix.o airnav_rtlpower.o airnav_utils.o airnav_main.o crc.o icao_filter.o mode_ac.o net_io.o util.o anet.o mode_s.o comm_b.o ais_charset.o track.o cpr.o stats.o convert.o rbfeeder.o rbfeeder.pb-c.o $(SDR_OBJ) $(COMPAT) $(CPUFEATURES_OBJS) $(STARCH_OBJS)
+rbfeeder: airnav_geomag.o airnav_anrb.o airnav_uat.o airnav_dumprb.o airnav_acars.o airnav_mlat.o airnav_vhf.o airnav_cmd.o airnav_proc_packets.o airnav_sk.o airnav_net.o airnav_asterix.o airnav_rtlpower.o airnav_utils.o airnav_main.o crc.o icao_filter.o mode_ac.o net_io.o util.o anet.o mode_s.o comm_b.o ais_charset.o track.o cpr.o stats.o convert.o rbfeeder.o rbfeeder.pb-c.o airnav_scom.o $(SDR_OBJ) $(COMPAT) $(CPUFEATURES_OBJS) $(STARCH_OBJS)
 	$(CC) -g -o $@ $^ $(LDFLAGS) $(LIBS) $(LIBS_SDR)
 
 

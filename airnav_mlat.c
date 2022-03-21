@@ -17,6 +17,41 @@ int autostart_mlat;
 char *mlat_config;
 char *mlat_input_type;
 
+void mlat_loadMlatConfig(void) {
+    ini_getString(&mlat_cmd, configuration_file, "mlat", "mlat_cmd", NULL);
+    if (mlat_cmd == NULL) {
+
+        if (file_exist("/usr/bin/mlat-client")) {
+            ini_getString(&mlat_cmd, configuration_file, "mlat", "mlat_cmd", "/usr/bin/mlat-client");
+        }
+
+    }
+
+    ini_getString(&mlat_input_type, configuration_file, "mlat", "input_type", "dump1090");
+    
+    ini_getString(&mlat_server, configuration_file, "mlat", "server", DEFAULT_MLAT_SERVER);
+    ini_getString(&mlat_pidfile, configuration_file, "mlat", "pid", NULL);
+    if (mlat_pidfile == NULL) {
+
+        if (file_exist("/usr/bin/mlat-client") && file_exist("/etc/default/mlat-client-config-rb")) {
+            ini_getString(&mlat_pidfile, configuration_file, "mlat", "pid", "/run/mlat-client-config-rb.pid");
+        }
+
+    }
+
+    autostart_mlat = ini_getBoolean(configuration_file, "mlat", "autostart_mlat", 1);
+    ini_getString(&mlat_config, configuration_file, "mlat", "config", NULL);
+    airnav_log_level(3, "MLAT Configuration file: %s\n", mlat_config);
+    if (mlat_config == NULL) {
+
+        if (file_exist("/etc/default/mlat-client-config-rb")) {
+            ini_getString(&mlat_config, configuration_file, "mlat", "config", "/etc/default/mlat-client-config-rb");
+            airnav_log_level(3, "MLAT Configuration file(2): %s\n", mlat_config);
+        }
+    }
+    
+}
+
 /*
  * Check if MLAT is running
  */

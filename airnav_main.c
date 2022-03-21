@@ -3,11 +3,14 @@
  * 
  * https://www.radarbox.com
  * 
- * More info: https://github.com/AirNav-Systems/rbfeeder
+ * More info: https://github.com/airnavsystems/rbfeeder
  * 
  */
 #include "rbfeeder.h"
 #include "airnav_main.h"
+#include "airnav_scom.h"
+#include "airnav_mlat.h"
+#include "airnav_uat.h"
 
 /*
  * Load configuration from ini file
@@ -413,16 +416,8 @@ void airnav_loadConfig(int argc, char **argv) {
     }
 
     // MLAT
-    ini_getString(&mlat_cmd, configuration_file, "mlat", "mlat_cmd", NULL);
-    if (mlat_cmd == NULL) {
-
-        if (file_exist("/usr/bin/mlat-client")) {
-            ini_getString(&mlat_cmd, configuration_file, "mlat", "mlat_cmd", "/usr/bin/mlat-client");
-        }
-
-    }
-
-    ini_getString(&mlat_input_type, configuration_file, "mlat", "input_type", "dump1090");
+    mlat_loadMlatConfig();
+    
     
 
     // dump1090-rb
@@ -464,46 +459,11 @@ void airnav_loadConfig(int argc, char **argv) {
     rfsurvey_dongle = ini_getInteger(configuration_file, "rtl_power", "rfsurvey_dongle", 0);
 
 
-    ini_getString(&mlat_server, configuration_file, "mlat", "server", DEFAULT_MLAT_SERVER);
-    ini_getString(&mlat_pidfile, configuration_file, "mlat", "pid", NULL);
-    if (mlat_pidfile == NULL) {
-
-        if (file_exist("/usr/bin/mlat-client") && file_exist("/etc/default/mlat-client-config-rb")) {
-            ini_getString(&mlat_pidfile, configuration_file, "mlat", "pid", "/run/mlat-client-config-rb.pid");
-        }
-
-    }
-
-    autostart_mlat = ini_getBoolean(configuration_file, "mlat", "autostart_mlat", 1);
-    ini_getString(&mlat_config, configuration_file, "mlat", "config", NULL);
-    airnav_log_level(3, "MLAT Configuration file: %s\n", mlat_config);
-    if (mlat_config == NULL) {
-
-        if (file_exist("/etc/default/mlat-client-config-rb")) {
-            ini_getString(&mlat_config, configuration_file, "mlat", "config", "/etc/default/mlat-client-config-rb");
-            airnav_log_level(3, "MLAT Configuration file(2): %s\n", mlat_config);
-        }
-    }
+    
 
     // dump978
-    ini_getString(&dump978_cmd, configuration_file, "dump978", "dump978_cmd", NULL);
-    if (dump978_cmd == NULL) {
-
-        airnav_log_level(3, "No 978 cmd defined! Let's try default....\n");
-        if (file_exist("/usr/bin/dump978-rb")) {
-            ini_getString(&dump978_cmd, configuration_file, "dump978", "dump978_cmd", "/usr/bin/dump978-rb");
-            dump978_enabled = ini_getBoolean(configuration_file, "dump978", "dump978_enabled", 1);
-        } else {
-            airnav_log_level(3, "No 978 binary found\n");
-            dump978_enabled = ini_getBoolean(configuration_file, "dump978", "dump978_enabled", 0);
-        }
-
-    } else {
-        dump978_enabled = ini_getBoolean(configuration_file, "dump978", "dump978_enabled", 1);
-    }
-
-
-    autostart_978 = ini_getBoolean(configuration_file, "dump978", "autostart_dump978", 0);
+    uat_loadUatConfig();
+    
 
 
     // ACARS
@@ -589,6 +549,9 @@ void airnav_loadConfig(int argc, char **argv) {
 
     send_beast_config = ini_getBoolean(configuration_file, "client", "send_beast_config", 1);
 
+    // Load serial device configuration
+    serial_loadSerialConfig();
+    
 
 }
 
@@ -735,6 +698,11 @@ void airnav_create_thread(void) {
     // Thread to send data
     pthread_create(&t_send_data, NULL, airnav_threadSendData, NULL);
 
+    if (serial_device != NULL) {
+        // Thread to get serial data
+        pthread_create(&t_serial_data, NULL, serial_threadGetSerialData, NULL);
+    }
+    
     // Thread for ANRB
     pthread_create(&t_anrb, NULL, anrb_threadWaitNewANRB, NULL);
     pthread_create(&t_anrb_send, NULL, anrb_threadSendDataANRB, NULL);

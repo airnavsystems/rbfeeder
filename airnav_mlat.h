@@ -31,6 +31,7 @@ extern "C" {
     
     
     /****** Functions ******/
+    void mlat_loadMlatConfig(void);
     int mlat_checkMLATRunning(void);
     void mlat_stopMLAT(void);
     void mlat_startMLAT(void);

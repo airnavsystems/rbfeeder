@@ -25,6 +25,7 @@ extern "C" {
 
 
     /****** Functions ******/
+    void uat_loadUatConfig(void);
     int uat_check978Running(void);
     void uat_start978(void);
     void uat_stop978(void);

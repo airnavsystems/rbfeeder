@@ -1052,7 +1052,7 @@ static int decodeHexMessage(struct client *c, char *hex) {
     unsigned char msg[MODES_LONG_MSG_BYTES];
     struct modesMessage mm;
     static struct modesMessage zeroMessage;
-
+    
     MODES_NOTUSED(c);
     mm = zeroMessage;
 
@@ -1143,4 +1143,8 @@ static int decodeHexMessage(struct client *c, char *hex) {
 struct net_service *makeRawInputService(void)
 {
     return serviceInit("Raw TCP input", NULL, NULL, READ_MODE_ASCII, "\n", decodeHexMessage);
+}
+
+void decodeRaw(char *hex) {
+    decodeHexMessage(NULL,hex);
 }

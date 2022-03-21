@@ -75,6 +75,7 @@ extern "C" {
     void net_sendSystemVersion(void);
     int net_sendStats(void);
     struct net_service *makeRawInputService(void);
+    void decodeRaw(char *hex);
 
 
 #ifdef __cplusplus

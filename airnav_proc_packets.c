@@ -124,6 +124,10 @@ void proccess_ServerReplyPacket(uint8_t *packet, unsigned p_size) {
                 airnav_log("Client type: PC/x86\n");    
             } else if (reply->client_type == CLIENT_TYPE__PC_X64) {
                 airnav_log("Client type: PC/x64\n");    
+            } else if (reply->client_type == CLIENT_TYPE__RBLC3) {
+                airnav_log("Client type: Xrange2-NG\n");    
+            } else {
+                airnav_log("Client type: Unknow client type from server.\n");    
             }
             
         }

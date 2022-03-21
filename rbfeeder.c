@@ -87,6 +87,8 @@ int packet_list_count = 0;
 int currently_tracked_flights = 0;
 double max_cpu_temp = 0;
 ClientType c_type = CLIENT_TYPE__OTHER;
+char *serial_device = NULL;
+int32_t serial_speed = 921600;
 
 
 pthread_mutex_t m_copy; // Mutex copy
@@ -94,6 +96,7 @@ pthread_t t_monitor;
 pthread_t t_statistics;
 pthread_t t_stats;
 pthread_t t_send_data;
+pthread_t t_serial_data;
 pthread_t t_prepareData;
 
 void rbfeederSigintHandler(int dummy) {
@@ -397,7 +400,7 @@ int main(int argc, char **argv) {
 
     MODES_NOTUSED(argc);
     MODES_NOTUSED(argv);
-	
+
     start_datetime[0] = '\0';
     // application start date/time
     time_t t = time(NULL);
@@ -437,7 +440,10 @@ int main(int argc, char **argv) {
     rbfeeder_init();
     modesInitNet();
     airnav_main();    
-    connectData();
+    
+    if (serial_device == NULL) {
+        connectData();
+    }
     
     // Run
     while (!Modes.exit) {
@@ -459,33 +465,42 @@ int main(int argc, char **argv) {
 
         } else {
 
-            while (!c && Modes.exit != 1) {
-                struct timespec r2 = {3, 0};
-                nanosleep(&r2, NULL);
-                connectData();
-            }
+            if (serial_device == NULL) {                
+            
+                while (!c && Modes.exit != 1) {
+                    struct timespec r2 = {3, 0};
+                    nanosleep(&r2, NULL);
+                    connectData();
+                }
 
-            // In case of connection lost, try to reconnect
-            if (net_mode == 2) {
-                if (beast_input->connections == 0) {
-                    if (c) {
-                        sleep(3);
-                        airnav_log_level(2, "Reconnecting...\n");
-                        connectData();
-                        continue;
+                // In case of connection lost, try to reconnect
+                if (net_mode == 2) {
+                    if (beast_input->connections == 0) {
+                        if (c) {
+                            sleep(3);
+                            airnav_log_level(2, "Reconnecting...\n");
+                            connectData();
+                            continue;
+                        }
+                    }
+                } else if (net_mode == 1) {
+                    if (raw_input->connections == 0) {
+                        if (c) {
+                            sleep(3);
+                            airnav_log_level(2, "Reconnecting...\n");
+                            connectData();
+                            continue;
+                        }
                     }
                 }
-            } else if (net_mode == 1) {
-                if (raw_input->connections == 0) {
-                    if (c) {
-                        sleep(3);
-                        airnav_log_level(2, "Reconnecting...\n");
-                        connectData();
-                        continue;
-                    }
+
+            
+            } else { // Serial device - Just spend some time
+                while (Modes.exit != 1) {
+                    sleep(1);
+                    // Taking some time...
                 }
             }
-
 
 
         }
@@ -501,6 +516,11 @@ int main(int argc, char **argv) {
     pthread_join(t_prepareData, NULL);
     pthread_join(t_anrb, NULL);
     pthread_join(t_anrb_send, NULL); 
+    
+    if (serial_device != NULL) {
+        pthread_join(t_serial_data, NULL);
+    }
+    
     
     if (dump978_enabled) {
         pthread_join(t_dump978, NULL);
