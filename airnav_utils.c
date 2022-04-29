@@ -512,7 +512,7 @@ ClientType getClientType(void) {
         return CLIENT_TYPE__PC_X64;
     } else {
 
-        airnav_log_level(1, "Entering else....\n");
+        airnav_log_level(4, "Entering else....\n");
 #ifdef __arm__        
         //airnav_log_level(1,"Client type: GENERIC_ARM_32\n");    
         return CLIENT_TYPE__GENERIC_ARM_32;

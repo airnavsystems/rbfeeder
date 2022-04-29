@@ -126,6 +126,7 @@ extern "C" {
     extern int packet_list_count;
     extern int currently_tracked_flights;
     extern pthread_mutex_t m_copy; // Mutex copy
+    extern pthread_mutex_t m_serial; // Serial mutex
     extern pthread_t t_monitor;
     extern pthread_t t_statistics;
     extern pthread_t t_stats;
@@ -134,8 +135,13 @@ extern "C" {
     extern pthread_t t_prepareData;
     extern double max_cpu_temp;
     extern ClientType c_type;
+    extern int fd_serial;
     extern char *serial_device;
     extern int32_t serial_speed;
+    extern struct termios tty;
+    extern int serial_use_att;
+    extern int serial_bias_t;
+    
 
 
     void receiverPositionChanged(float lat, float lon, float alt);

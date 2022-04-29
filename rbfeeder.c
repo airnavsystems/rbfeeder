@@ -87,11 +87,16 @@ int packet_list_count = 0;
 int currently_tracked_flights = 0;
 double max_cpu_temp = 0;
 ClientType c_type = CLIENT_TYPE__OTHER;
+int fd_serial = -1;
 char *serial_device = NULL;
 int32_t serial_speed = 921600;
+struct termios tty;
+int serial_use_att = 0;
+int serial_bias_t = 0;
 
 
-pthread_mutex_t m_copy; // Mutex copy
+pthread_mutex_t m_copy; // Mutex copy]
+pthread_mutex_t m_serial; // Serial mutex
 pthread_t t_monitor;
 pthread_t t_statistics;
 pthread_t t_stats;

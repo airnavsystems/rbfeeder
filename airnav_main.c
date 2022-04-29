@@ -241,7 +241,7 @@ void airnav_loadConfig(int argc, char **argv) {
 
         if (strlen(sharing_key) == 32) {
             printf("\nSharing key: %s\n", sharing_key);
-            printf("You can link this sharing key to your account at http://www.radarbox24.com\n");
+            printf("You can link this sharing key to your account at http://www.radarbox.com\n");
             printf("Configuration file: %s\n\n", configuration_file);
             exit(EXIT_SUCCESS);
         } else {
@@ -265,11 +265,7 @@ void airnav_loadConfig(int argc, char **argv) {
         printf("Log disabled in rbfeeder.ini configuration.\n");
     }
 
-#ifdef DEBUG_RELEASE
     ini_getString(&airnav_host, configuration_file, "server", "a_host", DEFAULT_AIRNAV_HOST);
-#else
-    ini_getString(&airnav_host, configuration_file, "server", "a_host", DEFAULT_AIRNAV_HOST);
-#endif
     airnav_port = ini_getInteger(configuration_file, "server", "a_port", 33755);
     airnav_port_v2 = ini_getInteger(configuration_file, "server", "a_port_v2", 33756);
     airnav_log_level(2, "Server address: %s\n", airnav_host);
@@ -655,7 +651,8 @@ void airnav_init_mutex(void) {
         printf("\n mutex init failed\n");
         exit(EXIT_FAILURE);
     }
-
+    
+    
     /*
      * Led ADSB Mutex
      */

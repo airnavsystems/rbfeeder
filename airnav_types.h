@@ -150,6 +150,10 @@ extern "C" {
         int *socket;
     } s_anrb;
 
+    typedef struct sdongle_version {
+        uint major;
+        uint minor;
+    } sdongle_version;
 
 
 
