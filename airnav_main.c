@@ -1083,22 +1083,22 @@ void *airnav_prepareData(void *arg) {
                     // Speed less than 50
                     if (trackDataValid(&b->gs_valid) && b->gs <= 50) {
                         force_send = 1;
-                        airnav_log_level(1, "[%06X, Callsign '%s'] Speed <= 50, force send.\n", (b->addr & 0xffffff), b->callsign);
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Speed <= 50, force send.\n", (b->addr & 0xffffff), b->callsign);
                     }
 
                     // Altitude < 3000
                     if (trackDataValid(&b->altitude_geom_valid) && b->altitude_geom <= 3000) {
                         force_send = 1;
-                        airnav_log_level(1, "[%06X, Callsign '%s'] Altitude (geometric) <= 3000, force send.\n", (b->addr & 0xffffff), b->callsign);
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Altitude (geometric) <= 3000, force send.\n", (b->addr & 0xffffff), b->callsign);
                     } else if (trackDataValid(&b->altitude_baro_valid) && b->altitude_baro <= 3000) {
                         force_send = 1;
-                        airnav_log_level(1, "[%06X, Callsign '%s'] Altitude (barometric) < 3000, force send.\n", (b->addr & 0xffffff), b->callsign);
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Altitude (barometric) < 3000, force send.\n", (b->addr & 0xffffff), b->callsign);
                     }
 
                     // Airborne = Ground
                     if (trackDataValid(&b->airground_valid) && b->airground == AG_GROUND && b->airground_valid.source >= SOURCE_MODE_S_CHECKED) {
                         force_send = 1;
-                        airnav_log_level(1, "[%06X, Callsign '%s'] Airborne = GROUND, force send. Altitude (baro): %d, Altitude (geom): %d\n", (b->addr & 0xffffff), b->callsign, b->altitude_baro, b->altitude_geom);
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Airborne = GROUND, force send. Altitude (baro): %d, Altitude (geom): %d\n", (b->addr & 0xffffff), b->callsign, b->altitude_baro, b->altitude_geom);
                     }
 
 
@@ -1107,19 +1107,19 @@ void *airnav_prepareData(void *arg) {
                         // Now, check altitude
                         if (trackDataValid(&b->altitude_geom_valid) && b->altitude_geom <= 10000) {
                             force_send = 1;
-                            airnav_log_level(1, "[%06X, Callsign '%s'] Geometric rate > 1000 and altitude (geom) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
+                            airnav_log_level(2, "[%06X, Callsign '%s'] Geometric rate > 1000 and altitude (geom) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
                         } else if (trackDataValid(&b->altitude_baro_valid) && b->altitude_baro <= 10000) {
                             force_send = 1;
-                            airnav_log_level(1, "[%06X, Callsign '%s'] Geometric rate > 1000 and altitude (baro) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
+                            airnav_log_level(2, "[%06X, Callsign '%s'] Geometric rate > 1000 and altitude (baro) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
                         }
                     } else if (trackDataValid(&b->baro_rate_valid) && b->baro_rate >= 1000) {
                         // Now, check altitude
                         if (trackDataValid(&b->altitude_geom_valid) && b->altitude_geom <= 10000) {
                             force_send = 1;
-                            airnav_log_level(1, "[%06X, Callsign '%s'] Baro rate > 1000 and altitude (geom) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
+                            airnav_log_level(2, "[%06X, Callsign '%s'] Baro rate > 1000 and altitude (geom) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
                         } else if (trackDataValid(&b->altitude_baro_valid) && b->altitude_baro <= 10000) {
                             force_send = 1;
-                            airnav_log_level(1, "[%06X, Callsign '%s'] Baro rate > 1000 and altitude (baro) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
+                            airnav_log_level(2, "[%06X, Callsign '%s'] Baro rate > 1000 and altitude (baro) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
                         }
                     }
 
@@ -1151,13 +1151,13 @@ void *airnav_prepareData(void *arg) {
                         }
 
                     } else {
-                        airnav_log_level(4, "[%06X] Callsign is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_CALLSIGN, b->callsign);
+                        airnav_log_level(2, "[%06X] Callsign is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_CALLSIGN, b->callsign);
                     }
 
 
                 }
 
-                airnav_log_level(4, "[%06X] Callsign: '%s'.\n", (b->addr & 0xffffff), b->callsign);
+                airnav_log_level(2, "[%06X] Callsign: '%s'.\n", (b->addr & 0xffffff), b->callsign);
 
 
                 // Check if Alt updated
@@ -1172,9 +1172,9 @@ void *airnav_prepareData(void *arg) {
                         acf2->airborne = 0;
                         acf2->airborne_set = 1;
                         send = 1;
-                        airnav_log_level(4, "[%06X] ******* Sending Airborne .\n", (b->addr & 0xffffff));
+                        airnav_log_level(2, "[%06X] ******* Sending Airborne .\n", (b->addr & 0xffffff));
                     } else {
-                        airnav_log_level(4, "[%06X] Airborne is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_AIRBORNE, b->an.rpisrv_emitted_airborne);
+                        airnav_log_level(2, "[%06X] Airborne is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_AIRBORNE, b->an.rpisrv_emitted_airborne);
                     }
 
 
@@ -1206,9 +1206,9 @@ void *airnav_prepareData(void *arg) {
                                 acf2->altitude_geo = b->altitude_geom;
                                 acf2->altitude_geo_set = 1;
                                 send = 1;
-                                airnav_log_level(4, "[%06X] Sending altitude_geom...%d\n", (b->addr & 0xffffff), b->altitude_geom);
+                                airnav_log_level(2, "[%06X] Sending altitude_geom...%d\n", (b->addr & 0xffffff), b->altitude_geom);
                             } else {
-                                airnav_log_level(4, "[%06X] Altitude (geom) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_AIRBORNE, b->an.rpisrv_emitted_altitude_geom);
+                                airnav_log_level(2, "[%06X] Altitude (geom) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_AIRBORNE, b->an.rpisrv_emitted_altitude_geom);
                             }
 
 
@@ -1255,10 +1255,10 @@ void *airnav_prepareData(void *arg) {
                                 send = 1;
 
 
-                                airnav_log_level(4, "[%06X] Sending altitude_baro...%d\n", (b->addr & 0xffffff), b->altitude_baro);
+                                airnav_log_level(2, "[%06X] Sending altitude_baro...%d\n", (b->addr & 0xffffff), b->altitude_baro);
 
                             } else {
-                                airnav_log_level(4, "[%06X] Altitude (baro) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_ALTITUDE, b->altitude_baro);
+                                airnav_log_level(2, "[%06X] Altitude (baro) is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_ALTITUDE, b->altitude_baro);
                             }
 
                             // Asterix
@@ -1321,12 +1321,12 @@ void *airnav_prepareData(void *arg) {
                             acf2->heading_set = 1;
                             send = 1;
 
-                            airnav_log_level(4, "[%06X] Sending heading (mag)...%d\n", (b->addr & 0xffffff), (b->mag_heading / 10));
+                            airnav_log_level(2, "[%06X] Sending heading (mag)...%d\n", (b->addr & 0xffffff), (b->mag_heading / 10));
 
                         }
 
                     } else {
-                        airnav_log_level(4, "[%06X] Heading (mag) is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_MAG_HEADING);
+                        airnav_log_level(2, "[%06X] Heading (mag) is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_MAG_HEADING);
                     }
 
                     // Asterix
@@ -1405,9 +1405,9 @@ void *airnav_prepareData(void *arg) {
                             acf->temperature = (short) tempC;
                             acf->temperature_set = 1;
                             send = 1;
-                            airnav_log_level(4, "[%06X] Sending Weather: Air temp: %.3f K (%.3f C); \n", (b->addr & 0xffffff), temp, tempC);
+                            airnav_log_level(2, "[%06X] Sending Weather: Air temp: %.3f K (%.3f C); \n", (b->addr & 0xffffff), temp, tempC);
                         } else {
-                            airnav_log_level(4, "[%06X] Weather temperature is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TEMPERATURE);
+                            airnav_log_level(2, "[%06X] Weather temperature is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TEMPERATURE);
                         }
 
 
@@ -1476,19 +1476,19 @@ void *airnav_prepareData(void *arg) {
                             acf->wind_speed = tmp_wind_speed;
                             acf->wind_speed_set = 1;
                             send = 1;
-                            airnav_log_level(4, "[%06X] Sending Weather: Air temp: %.3f K (%.3f C); wind speed: %.3f m/s; wind angle: %.3f degrees. Components: %.3f,%.3f\n", (b->addr & 0xffffff), temp, tempC, windSpeed, windHeading, windX, windY);
+                            airnav_log_level(2, "[%06X] Sending Weather: Air temp: %.3f K (%.3f C); wind speed: %.3f m/s; wind angle: %.3f degrees. Components: %.3f,%.3f\n", (b->addr & 0xffffff), temp, tempC, windSpeed, windHeading, windX, windY);
                         } else {
-                            airnav_log_level(4, "[%06X] Weather is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_WIND);
+                            airnav_log_level(2, "[%06X] Weather is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_WIND);
                         }
 
                         //airnav_log_level(5, "[%06X] Air temp: %.3f K (%.3f C); wind speed: %.3f m/s; wind angle: %.3f degrees. Components: %.3f,%.3f\n", (b->addr & 0xffffff), temp, tempC, windSpeed, windHeading, windX, windY);
 
                     } else {
-                        airnav_log_level(5, "[%06X] missing parameters for wind calculation: altitude_set: %d; altitude_set: %d; position_set: %d; heading_set: %d;\n", acf->altitude_set, acf->position_set, acf->heading_set);
+                        airnav_log_level(3, "[%06X] missing parameters for wind calculation: altitude_set: %d; altitude_set: %d; position_set: %d; heading_set: %d;\n", acf->altitude_set, acf->position_set, acf->heading_set);
                     }
 
                 } else {
-                    airnav_log_level(5, "[%06X] missing parameters for temperature calculation: mach_valid: %d; ias_valid: %d; altitude_baro_valid: %d; tas_valid: %d\n", trackDataValid(&b->mach_valid), trackDataValid(&b->ias_valid), trackDataValid(&b->altitude_baro_valid), trackDataValid(&b->tas_valid));
+                    airnav_log_level(3, "[%06X] missing parameters for temperature calculation: mach_valid: %d; ias_valid: %d; altitude_baro_valid: %d; tas_valid: %d\n", trackDataValid(&b->mach_valid), trackDataValid(&b->ias_valid), trackDataValid(&b->altitude_baro_valid), trackDataValid(&b->tas_valid));
                 }
 
                 // Check if Speed updated
@@ -1512,11 +1512,11 @@ void *airnav_prepareData(void *arg) {
                             acf2->gnd_speed = (b->gs / 10);
                             acf2->gnd_speed_set = 1;
                             send = 1;
-                            airnav_log_level(4, "[%06X] Sending ground speed...%.0f\n", (b->addr & 0xffffff), (b->gs / 10));
+                            airnav_log_level(2, "[%06X] Sending ground speed...%.0f\n", (b->addr & 0xffffff), (b->gs / 10));
                         }
 
                     } else {
-                        airnav_log_level(4, "[%06X] Gnd_speed is the same for less than %d seconds, will NOT send anything (b->gs: %.0f, emitted_gs: %.0f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_GS, (b->gs / 10), b->an.rpisrv_emitted_gs);
+                        airnav_log_level(2, "[%06X] Gnd_speed is the same for less than %d seconds, will NOT send anything (b->gs: %.0f, emitted_gs: %.0f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_GS, (b->gs / 10), b->an.rpisrv_emitted_gs);
                     }
 
 
@@ -1540,9 +1540,9 @@ void *airnav_prepareData(void *arg) {
                             acf2->vert_rate = (b->geom_rate / 10);
                             acf2->vert_rate_set = 1;
                             send = 1;
-                            airnav_log_level(4, "[%06X] Sending vertical rate geom...%d\n", (b->addr & 0xffffff), (b->geom_rate / 10));
+                            airnav_log_level(2, "[%06X] Sending vertical rate geom...%d\n", (b->addr & 0xffffff), (b->geom_rate / 10));
                         } else {
-                            airnav_log_level(4, "[%06X] geom_rate is the same for less than %d seconds, will NOT send anything (b->geom_rate: %d, emitted_geom_rate: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_GEOM_RATE, (b->geom_rate / 10), b->an.rpisrv_emitted_geom_rate);
+                            airnav_log_level(2, "[%06X] geom_rate is the same for less than %d seconds, will NOT send anything (b->geom_rate: %d, emitted_geom_rate: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_GEOM_RATE, (b->geom_rate / 10), b->an.rpisrv_emitted_geom_rate);
                         }
 
                     }
@@ -1563,9 +1563,9 @@ void *airnav_prepareData(void *arg) {
                             acf2->vert_rate = (b->baro_rate / 10);
                             acf2->vert_rate_set = 1;
                             send = 1;
-                            airnav_log_level(4, "[%06X] Sending vertical rate baro...%d\n", (b->addr & 0xffffff), (b->baro_rate / 10));
+                            airnav_log_level(2, "[%06X] Sending vertical rate baro...%d\n", (b->addr & 0xffffff), (b->baro_rate / 10));
                         } else {
-                            airnav_log_level(4, "[%06X] baro_rate is the same for less than %d seconds, will NOT send anything (b->baro_rate: %d, emitted_baro_rate: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_BARO_RATE, (b->baro_rate / 10), b->an.rpisrv_emitted_baro_rate);
+                            airnav_log_level(2, "[%06X] baro_rate is the same for less than %d seconds, will NOT send anything (b->baro_rate: %d, emitted_baro_rate: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_BARO_RATE, (b->baro_rate / 10), b->an.rpisrv_emitted_baro_rate);
                         }
 
                     }
@@ -1585,9 +1585,9 @@ void *airnav_prepareData(void *arg) {
                             acf2->squawk = b->squawk;
                             acf2->squawk_set = 1;
                             send = 1;
-                            airnav_log_level(4, "[%06X] Sending sqawk...%u\n", (b->addr & 0xffffff), b->squawk);
+                            airnav_log_level(2, "[%06X] Sending sqawk...%u\n", (b->addr & 0xffffff), b->squawk);
                         } else {
-                            airnav_log_level(4, "[%06X] squawk is the same for less than %d seconds, will NOT send anything (b->squawk: %u, emitted_squawk: %u).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_SQUAWKE, b->squawk, b->an.rpisrv_emitted_squawk);
+                            airnav_log_level(2, "[%06X] squawk is the same for less than %d seconds, will NOT send anything (b->squawk: %u, emitted_squawk: %u).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_SQUAWKE, b->squawk, b->an.rpisrv_emitted_squawk);
                         }
 
 
@@ -1612,10 +1612,10 @@ void *airnav_prepareData(void *arg) {
                         // ANRB
                         acf2->ias = (b->ias / 10);
                         acf2->ias_set = 1;
-                        airnav_log_level(4, "[%06X] Sending IAS...%u\n", (b->addr & 0xffffff), b->ias);
+                        airnav_log_level(2, "[%06X] Sending IAS...%u\n", (b->addr & 0xffffff), b->ias);
                         send = 1;
                     } else {
-                        airnav_log_level(4, "[%06X] ias is the same for less than %d seconds, will NOT send anything (b->ias: %u, emitted_ias: %u).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_IAS, (b->ias / 10), b->an.rpisrv_emitted_ias);
+                        airnav_log_level(2, "[%06X] ias is the same for less than %d seconds, will NOT send anything (b->ias: %u, emitted_ias: %u).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_IAS, (b->ias / 10), b->an.rpisrv_emitted_ias);
                     }
 
                 }
@@ -1637,34 +1637,34 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_nav_modes_time = tv.tv_sec;
 
                         if (b->nav_modes & NAV_MODE_AUTOPILOT) {
-                            airnav_log_level(5, "HEX: %06X, AutoPilot: ON\n", b->addr);
+                            airnav_log_level(3, "HEX: %06X, AutoPilot: ON\n", b->addr);
                             acf->nav_modes_autopilot_set = 1;
                         }
                         if (b->nav_modes & NAV_MODE_VNAV) {
-                            airnav_log_level(5, "HEX: %06X, VNAV: ON\n", b->addr);
+                            airnav_log_level(3, "HEX: %06X, VNAV: ON\n", b->addr);
                             acf->nav_modes_vnav_set = 1;
                         }
                         if (b->nav_modes & NAV_MODE_ALT_HOLD) {
-                            airnav_log_level(5, "HEX: %06X, AltitudeHold: ON\n", b->addr);
+                            airnav_log_level(3, "HEX: %06X, AltitudeHold: ON\n", b->addr);
                             acf->nav_modes_alt_hold_set = 1;
                         }
                         if (b->nav_modes & NAV_MODE_APPROACH) {
-                            airnav_log_level(5, "HEX: %06X, Aproach: ON\n", b->addr);
+                            airnav_log_level(3, "HEX: %06X, Aproach: ON\n", b->addr);
                             acf->nav_modes_aproach_set = 1;
                         }
                         if (b->nav_modes & NAV_MODE_LNAV) {
-                            airnav_log_level(5, "HEX: %06X, LNAV: ON\n", b->addr);
+                            airnav_log_level(3, "HEX: %06X, LNAV: ON\n", b->addr);
                             acf->nav_modes_lnav_set = 1;
                         }
                         if (b->nav_modes & NAV_MODE_TCAS) {
-                            airnav_log_level(5, "HEX: %06X, TCAS: ON\n", b->addr);
+                            airnav_log_level(3, "HEX: %06X, TCAS: ON\n", b->addr);
                             acf->nav_modes_tcas_set = 1;
                         }
 
-                        airnav_log_level(4, "[%06X] Sending navigation modes\n", (b->addr & 0xffffff));
+                        airnav_log_level(2, "[%06X] Sending navigation modes\n", (b->addr & 0xffffff));
 
                     } else {
-                        airnav_log_level(4, "[%06X] nav_modes is the same for less than %d seconds, will NOT send anything (nav_modes).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_IAS, b->nav_modes);
+                        airnav_log_level(2, "[%06X] nav_modes is the same for less than %d seconds, will NOT send anything (nav_modes).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_IAS, b->nav_modes);
                     }
 
 
@@ -1680,9 +1680,9 @@ void *airnav_prepareData(void *arg) {
                             b->an.rpisrv_emitted_nav_altitude_fms_time = tv.tv_sec;
                             acf->nav_altitude_fms_set = 1;
                             acf->nav_altitude_fms = (int) b->nav_altitude_fms;
-                            airnav_log_level(4, "[%06X] Sending nav_altitude_fms: %u!\n", b->addr, b->nav_altitude_fms);
+                            airnav_log_level(2, "[%06X] Sending nav_altitude_fms: %u!\n", b->addr, b->nav_altitude_fms);
                         } else {
-                            airnav_log_level(4, "[%06X] nav_altitude_fms is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_NAV_ALT_FMS);
+                            airnav_log_level(2, "[%06X] nav_altitude_fms is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_NAV_ALT_FMS);
                         }
 
 
@@ -1698,9 +1698,9 @@ void *airnav_prepareData(void *arg) {
 
                             acf->nav_altitude_mcp_set = 1;
                             acf->nav_altitude_mcp = b->nav_altitude_mcp;
-                            airnav_log_level(4, "[%06X] Sending nav_altitude_mcp: %u!\n", b->addr, b->nav_altitude_mcp);
+                            airnav_log_level(2, "[%06X] Sending nav_altitude_mcp: %u!\n", b->addr, b->nav_altitude_mcp);
                         } else {
-                            airnav_log_level(4, "[%06X] nav_altitude_mcp is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_NAV_ALT_MCP);
+                            airnav_log_level(2, "[%06X] nav_altitude_mcp is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_NAV_ALT_MCP);
                         }
 
                     }
@@ -1737,9 +1737,9 @@ void *airnav_prepareData(void *arg) {
 
                         acf->nav_qnh_set = 1;
                         acf->nav_qnh = (int) b->nav_qnh;
-                        airnav_log_level(4, "[%06X] Sending NAV QNH Set: %.2f (%d)\n", (b->addr & 0xffffff), b->nav_qnh, (int) b->nav_qnh);
+                        airnav_log_level(2, "[%06X] Sending NAV QNH Set: %.2f (%d)\n", (b->addr & 0xffffff), b->nav_qnh, (int) b->nav_qnh);
                     } else {
-                        airnav_log_level(4, "[%06X] nav_qnh is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), b->nav_qnh);
+                        airnav_log_level(2, "[%06X] nav_qnh is the same for less than %d seconds, will NOT send anything (%d).\n", (b->addr & 0xffffff), b->nav_qnh);
                     }
 
                 }
@@ -1749,7 +1749,7 @@ void *airnav_prepareData(void *arg) {
                     if ((int) b->nav_heading != 0) {
                         acf->nav_heading_set = 1;
                         acf->nav_heading = (int) b->nav_heading;
-                        airnav_log_level(4, "HEX: %06X, NAV Heading Set: %.2f (%d)\n", b->addr, b->nav_heading, (int) b->nav_heading);
+                        airnav_log_level(2, "HEX: %06X, NAV Heading Set: %.2f (%d)\n", b->addr, b->nav_heading, (int) b->nav_heading);
                     }
                 }
 

@@ -497,10 +497,13 @@ void net_force_disconnect(void) {
 struct p_data *net_preparePacket_v2(void) {
     struct p_data *pakg = malloc(sizeof (struct p_data));
 
+    pakg->timestp = 0;
+    memset(pakg->p_timestamp, 0, 25);
     pakg->cmd = 0;
     pakg->c_version = 0;
     pakg->c_type = 0;
     pakg->c_type_set = 0;
+    memset(pakg->c_sn, 0, 30);
     memset(pakg->c_key, 0, 33);
     pakg->c_key_set = 0;
     pakg->c_version_set = 0;
@@ -510,6 +513,8 @@ struct p_data *net_preparePacket_v2(void) {
     pakg->callsign_set = 0;
     pakg->altitude = 0;
     pakg->altitude_set = 0;
+    pakg->altitude_geo = 0;
+    pakg->altitude_geo_set = 0;
     pakg->lat = 0;
     pakg->lon = 0;
     pakg->position_set = 0;
@@ -540,6 +545,8 @@ struct p_data *net_preparePacket_v2(void) {
     pakg->nav_heading_set = 0;
     pakg->nav_qnh = 0;
     pakg->nav_qnh_set = 0;
+    pakg->nav_altitude_src = 0;
+    
 
     // Weather
     pakg->weather_source = 0;
@@ -575,7 +582,7 @@ struct p_data *net_preparePacket_v2(void) {
     pakg->static_air_temperature_set = 0;
 
     // Nav Modes    
-    pakg->nav_modes_autopilot_set = 1;
+    pakg->nav_modes_autopilot_set = 0;
     pakg->nav_modes_vnav_set = 0;
     pakg->nav_modes_alt_hold_set = 0;
     pakg->nav_modes_aproach_set = 0;
@@ -584,25 +591,18 @@ struct p_data *net_preparePacket_v2(void) {
 
     // New fields - 24-08-2021
     pakg->pos_nic = 0;
-    pakg->pos_nic_set = 0;
-    
+    pakg->pos_nic_set = 0;    
     pakg->nic_baro = 0;
-    pakg->nic_baro_set = 0;
-    
+    pakg->nic_baro_set = 0;    
     pakg->nac_p = 0;
-    pakg->nac_p_set = 0;
-    
+    pakg->nac_p_set = 0;   
     pakg->nac_v = 0;
     pakg->nac_v_set = 0;
-
     pakg->sil = 0;
-    pakg->sil_set = 0;
-    
+    pakg->sil_set = 0;    
     pakg->sil_type = 0;
     pakg->sil_type_set = 0;
-
     pakg->c_type = getClientType();
-
     pakg->gnd_speed_full = 0;
     pakg->gnd_speed_full_set = 0;
     pakg->vert_rate_full = 0;
