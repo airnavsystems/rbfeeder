@@ -1355,6 +1355,20 @@ void *airnav_prepareData(void *arg) {
                     }
                 }
 
+                // Weather information
+                if (trackDataAge(&b->temperature_valid) <= AIRNAV_MAX_ITEM_AGE) {
+                    if (trackDataValid(&b->temperature_valid)) {
+                        airnav_log_level(1,"[%06X] Temperature (MRAR): %.2f\n", (b->addr & 0xffffff), b->temperature);
+                    }
+                }
+                if (trackDataAge(&b->wind_valid) <= AIRNAV_MAX_ITEM_AGE) {
+                    if (trackDataValid(&b->wind_valid)) {
+                        airnav_log_level(1,"[%06X] Wind Dir and Speed (MRAR): '%.2f' - '%.2f'\n", (b->addr & 0xffffff), b->wind_dir, b->wind_speed);
+                    }
+                }
+                
+                
+                
                 // Calculate air temperature and wind speed/direction
                 if (trackDataValid(&b->mach_valid) && trackDataValid(&b->ias_valid) && trackDataValid(&b->altitude_baro_valid) && trackDataValid(&b->tas_valid)) {
 
@@ -1397,17 +1411,21 @@ void *airnav_prepareData(void *arg) {
                     // Calculate wind speed/direction
                     if ((acf->altitude_set == 1) && (acf->position_set == 1) && (acf->heading_set == 1)) {
 
-                        // If we have altitude and location set, we can check if we need to send temperature or not
-                        if (((tv.tv_sec - b->an.rpisrv_emitted_temperature_time) >= MAX_TIME_FIELD_TEMPERATURE) || (b->an.rpisrv_emitted_temperature != (short) tempC)) { // 
-                            b->an.rpisrv_emitted_temperature = (short) tempC;
-                            b->an.rpisrv_emitted_temperature_time = tv.tv_sec;
+                        if ((tempC > -90) && (tempC < 100)) { // xTreme range
+                            
+                            // If we have altitude and location set, we can check if we need to send temperature or not
+                            if (((tv.tv_sec - b->an.rpisrv_emitted_temperature_time) >= MAX_TIME_FIELD_TEMPERATURE) || (b->an.rpisrv_emitted_temperature != (short) tempC)) { //                             
+                                b->an.rpisrv_emitted_temperature = (short) tempC;
+                                b->an.rpisrv_emitted_temperature_time = tv.tv_sec;
 
-                            acf->temperature = (short) tempC;
-                            acf->temperature_set = 1;
-                            send = 1;
-                            airnav_log_level(2, "[%06X] Sending Weather: Air temp: %.3f K (%.3f C); \n", (b->addr & 0xffffff), temp, tempC);
-                        } else {
-                            airnav_log_level(2, "[%06X] Weather temperature is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TEMPERATURE);
+                                acf->temperature = (short) tempC;
+                                acf->temperature_set = 1;
+                                send = 1;
+                                airnav_log_level(2, "[%06X] Sending Weather: Air temp: %.3f K (%.3f C); \n", (b->addr & 0xffffff), temp, tempC);
+                            } else {
+                                airnav_log_level(2, "[%06X] Weather temperature is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TEMPERATURE);
+                            }
+                            
                         }
 
 
@@ -1476,12 +1494,11 @@ void *airnav_prepareData(void *arg) {
                             acf->wind_speed = tmp_wind_speed;
                             acf->wind_speed_set = 1;
                             send = 1;
-                            airnav_log_level(2, "[%06X] Sending Weather: Air temp: %.3f K (%.3f C); wind speed: %.3f m/s; wind angle: %.3f degrees. Components: %.3f,%.3f\n", (b->addr & 0xffffff), temp, tempC, windSpeed, windHeading, windX, windY);
+                            airnav_log_level(2, "[%06X] Sending Weather: wind speed: %.3f m/s; wind angle: %.3f degrees. Components: %.3f,%.3f\n", (b->addr & 0xffffff), windSpeed, windHeading, windX, windY);
                         } else {
                             airnav_log_level(2, "[%06X] Weather is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_WIND);
                         }
-
-                        //airnav_log_level(5, "[%06X] Air temp: %.3f K (%.3f C); wind speed: %.3f m/s; wind angle: %.3f degrees. Components: %.3f,%.3f\n", (b->addr & 0xffffff), temp, tempC, windSpeed, windHeading, windX, windY);
+                        
 
                     } else {
                         airnav_log_level(3, "[%06X] missing parameters for wind calculation: altitude_set: %d; altitude_set: %d; position_set: %d; heading_set: %d;\n", acf->altitude_set, acf->position_set, acf->heading_set);
