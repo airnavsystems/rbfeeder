@@ -1,3 +1,11 @@
+rbfeeder (1:1.0.8+deb9) stretch; urgency=medium
+
+  * Fix altitude wrong value.
+  * Update dump1090 to the latest version.
+  * Filter calculated weather values. 
+
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Mon, 27 Jun 2022 11:00:56 +0300
+
 rbfeeder (1:1.0.7+deb11) bullseye; urgency=medium
 
   * 64bits release for bullseye.
