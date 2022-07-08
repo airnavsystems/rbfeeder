@@ -5,8 +5,8 @@ Maintainer: Airnav Systems <dev@airnavsystems.com>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.5
 Homepage: http://www.radarbox24.com
-Vcs-Git: https://github.com/AirNav-Systems/rbfeeder
-Vcs-Browser: https://github.com/AirNav-Systems/rbfeeder
+Vcs-Git: https://github.com/airnavsystems/rbfeeder
+Vcs-Browser: https://github.com/airnavsystems/rbfeeder
 
 Package: rbfeeder
 Architecture: any
