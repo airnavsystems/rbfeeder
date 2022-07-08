@@ -119,7 +119,7 @@ extern "C" {
         short mrar_wind_dir_set;
         double mrar_pressure;
         short mrar_pressure_set;
-        hazard_t mrar_turbulence;
+        unsigned mrar_turbulence;
         short mrar_turbulence_set;
         double mrar_humidity;
         short mrar_humidity_set;
