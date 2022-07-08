@@ -67,6 +67,18 @@ extern "C" {
 #define MAX_TIME_FIELD_BARO_RATE        60
 #define MAX_TIME_FIELD_SQUAWKE          120 // 2 minutes
 #define MAX_TIME_FIELD_IAS              60
+#define MAX_TIME_FIELD_TAS              60
+#define MAX_TIME_FIELD_TRACK            60
+#define MAX_TIME_FIELD_TRUE_HEADING     60    
+#define MAX_TIME_FIELD_ROLL             60    
+#define MAX_TIME_FIELD_MRAR_WIND        180    
+#define MAX_TIME_FIELD_MRAR_PRESSURE    180    
+#define MAX_TIME_FIELD_MRAR_TEMPERATURE 180    
+#define MAX_TIME_FIELD_MRAR_HUMIDITY    180    
+#define MAX_TIME_FIELD_MRAR_TURBULENCE  180    
+#define MAX_TIME_FIELD_ADSB_VERSION     180
+#define MAX_TIME_FIELD_ADSR_VERSION     180
+#define MAX_TIME_FIELD_TISB_VERSION     180
 #define MAX_TIME_FIELD_CALLSIGN         60
 #define MAX_TIME_FIELD_NAV_MODES        180 // 3 minutes
 #define MAX_TIME_FIELD_AIRBORNE         180 // 3 minutes
@@ -141,6 +153,8 @@ extern "C" {
     extern struct termios tty;
     extern int serial_use_att;
     extern int serial_bias_t;
+    extern int debug_level_cmd;
+    extern char *debug_filter;
     
 
 

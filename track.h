@@ -300,21 +300,28 @@ struct aircraft {
         long rpisrv_emitted_geom_rate_time;
 
         float rpisrv_emitted_track; //      -"-         true track
+        long  rpisrv_emitted_track_time;
+        
         float rpisrv_emitted_track_rate; //      -"-         track rate of change
 
         float rpisrv_emitted_mag_heading; //      -"-         magnetic heading
         long rpisrv_emitted_mag_heading_time;
 
         float rpisrv_emitted_true_heading; //      -"-         true heading
+        long rpisrv_emitted_true_heading_time;
+        
         float rpisrv_emitted_roll; //      -"-         roll angle
+        long rpisrv_emitted_roll_time; //  
 
         float rpisrv_emitted_gs; //      -"-         groundspeed
         long rpisrv_emitted_gs_time;
 
         unsigned rpisrv_emitted_ias; //      -"-         IAS
         long rpisrv_emitted_ias_time;
-
-        unsigned rpisrv_emitted_tas; //      -"-         TAS
+        
+        unsigned rpisrv_emitted_tas; //      -"-         IAS
+        long rpisrv_emitted_tas_time;
+        
         float rpisrv_emitted_mach; //      -"-         Mach number
         airground_t rpisrv_emitted_airground; //      -"-         air/ground state
         unsigned rpisrv_emitted_nav_altitude_mcp; //      -"-         MCP altitude
@@ -338,7 +345,16 @@ struct aircraft {
         long rpisrv_emitted_callsign_time;
 
         addrtype_t rpisrv_emitted_addrtype; //      -"-         address type (assumed ADSB_ICAO initially)
+        
         int rpisrv_emitted_adsb_version; //      -"-         ADS-B version (assumed non-ADS-B initially)
+        long rpisrv_emitted_adsb_version_time; //
+        
+        int rpisrv_emitted_adsr_version; //      -"-         ADS-R version (assumed non-ADS-B initially)
+        long rpisrv_emitted_adsr_version_time; //
+        
+        int rpisrv_emitted_tisb_version; //      -"-         TIS-B version (assumed non-ADS-B initially)
+        long rpisrv_emitted_tisb_version_time; //
+        
         unsigned rpisrv_emitted_category; //      -"-         ADS-B emitter category (assumed A0 initially)
 
         unsigned rpisrv_emitted_squawk; //      -"-         squawk
@@ -365,11 +381,24 @@ struct aircraft {
         short rpisrv_emitted_wind_dir; //      -"-         Wind dir    
         short rpisrv_emitted_wind_speed; //      -"-         Wind speed
         long rpisrv_emitted_wind_time; //      -"-         
-
         short rpisrv_emitted_temperature; //      -"-         Temperature
         long rpisrv_emitted_temperature_time; //      -"-         
         
-
+        // MRAR
+        float rpisrv_emitted_mrar_wind; //            -"-         MRAR Wind
+        long  rpisrv_emitted_mrar_wind_time;  //
+        
+        float rpisrv_emitted_mrar_pressure; //            -"-         MRAR Pressure
+        long  rpisrv_emitted_mrar_pressure_time;  //
+        
+        float rpisrv_emitted_mrar_temperature; //            -"-         MRAR Temperature
+        long  rpisrv_emitted_mrar_temperature_time;  //
+        
+        float rpisrv_emitted_mrar_humidity; //            -"-         MRAR Humidity
+        long  rpisrv_emitted_mrar_humidity_time;  //
+        
+        hazard_t rpisrv_emitted_mrar_turbulence; //            -"-         MRAR Turbulence
+        long  rpisrv_emitted_mrar_turbulence_time;  //
 
         uint64_t rpisrv_last_emitted; // time (millis) aircraft was last emitted
         uint64_t rpisrv_last_force_emit; // time (millis) we last emitted only-on-change data

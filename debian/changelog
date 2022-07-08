@@ -3,6 +3,21 @@ rbfeeder (1:1.0.8+deb9) stretch; urgency=medium
   * Fix altitude wrong value.
   * Update dump1090 to the latest version.
   * Filter calculated weather values. 
+  * New field: TAS.
+  * New field: Track.
+  * New field: True Heading.
+  * New field: ADS-B Version.
+  * New field: ADS-R Version.
+  * New field: TIS-B Version.
+  * New field: MRAR Wind Speed.
+  * New field: MRAR Wind Dir.
+  * New field: MRAR Pressure.
+  * New field: MRAR Temperature.
+  * New field: MRAR Turbulence.
+  * New field: MRAR Humidity.
+  * New field: Roll.
+  * New command line option: --debug-level (override configuration file).
+  * New command line option: --debug-filter <text> to filter debug messages.
 
  --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Mon, 27 Jun 2022 11:00:56 +0300
 

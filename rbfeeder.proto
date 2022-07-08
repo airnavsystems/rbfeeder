@@ -20,6 +20,13 @@ enum SilType {
     SIL_PER_HOUR = 3;
 }
 
+enum TurbulenceType {
+   HAZARD_NIL = 0;
+   HAZARD_LIGHT = 1;
+   HAZARD_MODERATE = 2;
+   HAZARD_SEVERE = 3;
+}
+
 message FlightData {
     required int32 addr = 1; // ModeS Address
     optional AddrType addr_type = 2; // ModeS Address
@@ -69,6 +76,20 @@ message FlightData {
     optional uint32 ias_full                    = 44; // IAS - Full value 
     optional double heading_full                = 45; // Heading - Full
 
+    // New fields
+    optional uint32 tas                         = 46; // True airspeed
+    optional double track                       = 47; // Ground Track
+    optional double true_heading                = 48; // True heading
+    optional int32  adsb_version                = 49; // ADS-B Version
+    optional int32  adsr_version                = 50; // ADS-R Version
+    optional int32  tisb_version                = 51; // TIS-B Version    
+    optional double mrar_wind_speed             = 52; // MRAR - Wind Speed
+    optional double mrar_wind_dir               = 53; // MRAR - Wind dir
+    optional double mrar_pressure               = 54; // MRAR - Pressure
+    optional double mrar_temperature            = 55; // MRAR - Temperature
+    optional TurbulenceType mrar_turbulence     = 56; // MRAR - Turbulence
+    optional double mrar_humidity               = 57; // MRAR - Humidity
+    optional double roll                        = 58; // Roll
 }
 
 message FlightPacket {

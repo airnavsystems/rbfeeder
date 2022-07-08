@@ -93,6 +93,8 @@ int32_t serial_speed = 921600;
 struct termios tty;
 int serial_use_att = 0;
 int serial_bias_t = 0;
+int debug_level_cmd = -1;
+char *debug_filter = NULL;
 
 
 pthread_mutex_t m_copy; // Mutex copy]

@@ -50,6 +50,12 @@ extern "C" {
         short gnd_speed_set;
         short ias;
         short ias_set;
+        uint32_t tas;
+        short tas_set;
+        double track;
+        short track_set;
+        double true_heading;
+        short true_heading_set;
         uint32_t ias_full;
         short ias_full_set;
         short vert_rate;
@@ -69,7 +75,10 @@ extern "C" {
         short extra_flags_set;
         int is_mlat;
         short is_978;
-
+        double roll;
+        short roll_set;
+        
+        // NAV
         short nav_altitude_fms_set;
         unsigned nav_altitude_fms;
         short nav_altitude_mcp_set;
@@ -89,8 +98,7 @@ extern "C" {
         short nav_modes_tcas_set;
 
 
-        // Weather
-        // BDS4,4
+        // Weather        
         char weather_source;
         short weather_source_set;
         short wind_dir;
@@ -104,23 +112,20 @@ extern "C" {
         char humidity;
         short humidity_set;
 
-        // BDS4,5
-        char turbulence;
-        short turbulence_set;
-        char wind_shear;
-        short wind_shear_set;
-        char micro_burst;
-        short micro_burst_set;
-        char icing_level;
-        short icing_level_set;
-        char wake_vortex;
-        short wake_vortex_set;
-        int32_t average_static_pressure;
-        short average_static_pressure_set;
-        int32_t radio_height;
-        short radio_height_set;
-        int32_t static_air_temperature;
-        short static_air_temperature_set;
+        // MRAR
+        double mrar_wind_speed;
+        short mrar_wind_speed_set;
+        double mrar_wind_dir;
+        short mrar_wind_dir_set;
+        double mrar_pressure;
+        short mrar_pressure_set;
+        hazard_t mrar_turbulence;
+        short mrar_turbulence_set;
+        double mrar_humidity;
+        short mrar_humidity_set;
+        double mrar_temperature;
+        short mrar_temperature_set;
+        
 
         unsigned pos_nic;
         char pos_nic_set;
@@ -135,7 +140,14 @@ extern "C" {
         unsigned sil_type;
         char sil_type_set;
 
+        int32_t adsb_version;
+        short adsb_version_set;
+        int32_t adsr_version;
+        short adsr_version_set;
+        int32_t tisb_version;
+        short tisb_version_set;
 
+        
     } p_data;
 
     typedef struct packet_list {

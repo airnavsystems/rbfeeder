@@ -563,23 +563,20 @@ struct p_data *net_preparePacket_v2(void) {
     pakg->humidity_set = 0;
 
 
-    // BDS4,5
-    pakg->turbulence = 0;
-    pakg->turbulence_set = 0;
-    pakg->wind_shear = 0;
-    pakg->wind_shear_set = 0;
-    pakg->micro_burst = 0;
-    pakg->micro_burst_set = 0;
-    pakg->icing_level = 0;
-    pakg->icing_level_set = 0;
-    pakg->wake_vortex = 0;
-    pakg->wake_vortex_set = 0;
-    pakg->average_static_pressure = 0;
-    pakg->average_static_pressure_set = 0;
-    pakg->radio_height = 0;
-    pakg->radio_height_set = 0;
-    pakg->static_air_temperature = 0;
-    pakg->static_air_temperature_set = 0;
+    // MRAR    
+    pakg->mrar_wind_speed = 0;
+    pakg->mrar_wind_speed_set = 0;
+    pakg->mrar_wind_dir = 0;
+    pakg->mrar_wind_dir_set = 0;
+    pakg->mrar_pressure = 0;
+    pakg->mrar_pressure_set = 0;
+    pakg->mrar_turbulence = 0;
+    pakg->mrar_turbulence_set = 0;
+    pakg->mrar_humidity = 0;
+    pakg->mrar_humidity_set = 0;
+    pakg->mrar_temperature = 0;
+    pakg->mrar_temperature_set = 0;
+        
 
     // Nav Modes    
     pakg->nav_modes_autopilot_set = 0;
@@ -611,6 +608,20 @@ struct p_data *net_preparePacket_v2(void) {
     pakg->ias_full_set = 0;    
     pakg->heading_full = 0;
     pakg->heading_full_set = 0;
+    
+    // New fields - 07-07-2022
+    pakg->track = 0;
+    pakg->track_set = 0;
+    pakg->true_heading = 0;
+    pakg->true_heading_set = 0;
+    pakg->adsb_version = 0;
+    pakg->adsb_version_set = 0;
+    pakg->adsr_version = 0;
+    pakg->adsr_version_set = 0;
+    pakg->tisb_version = 0;
+    pakg->tisb_version_set = 0;
+    pakg->roll = 0;
+    pakg->roll_set = 0;
     
     return pakg;
 }

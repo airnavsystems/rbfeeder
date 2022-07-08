@@ -478,6 +478,70 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
             subs[i]->has_heading_full = 1;
         }
         
+        if (flights->packet->tas_set == 1) {                        
+            subs[i]->tas = flights->packet->tas;
+            subs[i]->has_tas = 1;            
+        }
+        
+        if (flights->packet->track_set == 1) {                        
+            subs[i]->track = flights->packet->track;
+            subs[i]->has_track = 1;            
+        }
+        
+        if (flights->packet->true_heading_set == 1) {                        
+            subs[i]->true_heading = flights->packet->true_heading;
+            subs[i]->has_true_heading = 1;            
+        }
+        
+        if (flights->packet->adsb_version_set == 1) {                        
+            subs[i]->adsb_version = flights->packet->adsb_version;
+            subs[i]->has_adsb_version = 1;            
+        }
+        
+        if (flights->packet->adsr_version_set == 1) {                        
+            subs[i]->adsr_version = flights->packet->adsr_version;
+            subs[i]->has_adsr_version = 1;            
+        }
+        
+        if (flights->packet->tisb_version_set == 1) {                        
+            subs[i]->tisb_version = flights->packet->tisb_version;
+            subs[i]->has_tisb_version = 1;            
+        }
+        
+        if (flights->packet->mrar_wind_speed_set == 1) {                        
+            subs[i]->mrar_wind_speed = flights->packet->mrar_wind_speed;
+            subs[i]->has_mrar_wind_speed = 1;            
+        }
+        
+        if (flights->packet->mrar_wind_dir_set == 1) {                        
+            subs[i]->mrar_wind_dir = flights->packet->mrar_wind_dir;
+            subs[i]->has_mrar_wind_dir = 1;            
+        }
+        
+        if (flights->packet->mrar_pressure_set == 1) {                        
+            subs[i]->mrar_pressure = flights->packet->mrar_temperature;
+            subs[i]->has_mrar_pressure = 1;            
+        }
+        
+        if (flights->packet->mrar_temperature_set == 1) {                        
+            subs[i]->mrar_temperature = flights->packet->mrar_temperature;
+            subs[i]->has_mrar_temperature = 1;            
+        }
+        
+        if (flights->packet->mrar_humidity_set == 1) {                        
+            subs[i]->mrar_humidity = flights->packet->mrar_humidity;
+            subs[i]->has_mrar_humidity = 1;            
+        }
+        
+        if (flights->packet->mrar_turbulence_set == 1) {                        
+            subs[i]->mrar_turbulence = flights->packet->mrar_turbulence;
+            subs[i]->has_mrar_turbulence = 1;            
+        }
+        
+        if (flights->packet->roll_set == 1) {                        
+            subs[i]->roll = flights->packet->roll;
+            subs[i]->has_roll = 1;            
+        }
         
         free(flights->packet);
         struct packet_list *old = flights;
@@ -522,7 +586,7 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
     for (i = 0; i < qtd; i++){
         if (subs[i]->callsign != NULL) {
             free(subs[i]->callsign);
-        }
+        }        
         free(subs[i]);
     }
     free(subs);

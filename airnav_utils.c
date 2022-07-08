@@ -140,7 +140,18 @@ void airnav_log_level_m(const char* fname, const int level, const char* format, 
         msg[1023] = 0;
         msg2[1023] = 0;
         if (daemon_mode == 0) {
-            fprintf(stdout, "%s \x1B[35m[\x1B[31m%s\x1B[35m]\x1B[0m  %s", timebuf, fname, msg);
+            // Check filter
+            if (debug_filter != NULL) {
+            
+                if (strstr(msg, debug_filter) != NULL) {
+                    fprintf(stdout, "%s \x1B[35m[\x1B[31m%s\x1B[35m]\x1B[0m  %s", timebuf, fname, msg);
+                }
+                
+            } else {
+                fprintf(stdout, "%s \x1B[35m[\x1B[31m%s\x1B[35m]\x1B[0m  %s", timebuf, fname, msg);
+            }
+                        
+            
         } else {
             syslog(LOG_NOTICE, "%s [%s] %s", timebuf2, fname, msg);
         }

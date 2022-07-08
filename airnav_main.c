@@ -50,7 +50,7 @@ void airnav_loadConfig(int argc, char **argv) {
     short protocol = 0;
     AN_NOTUSED(protocol);
     short protocol_changed = 0;
-    AN_NOTUSED(protocol_changed);
+    AN_NOTUSED(protocol_changed);    
 
 
     // Print version information
@@ -82,6 +82,21 @@ void airnav_loadConfig(int argc, char **argv) {
                     airnav_log("Invalid argument for device (--device).\n");
                     exit(EXIT_FAILURE);
                 }
+                
+            } else if (!strcmp(argv[j], "--debug-filter") || !strcmp(argv[j], "-df")) {
+                if (argc - 1 > j && argv[j + 1][0] != '-') {
+                    debug_filter = strdup(argv[++j]);
+                    airnav_log("Debug filter set to '%s'\n",debug_filter);                
+                } else {
+                    airnav_log("Invalid argument for debug filter (--debug-filter).\n");
+                    exit(EXIT_FAILURE);
+                }    
+                
+            } else if (!strcmp(argv[j], "--debug-level") || !strcmp(argv[j], "-dl")) {
+                                
+                debug_level_cmd = atoi(argv[++j]);
+                airnav_log("Debug level set to %d\n",debug_level_cmd);                
+                
             } else if (!strcmp(argv[j], "--help") || !strcmp(argv[j], "-h")) {
                 airnav_showHelp();
                 exit(EXIT_SUCCESS);
@@ -171,9 +186,7 @@ void airnav_loadConfig(int argc, char **argv) {
 
         }
 
-    }
-
-
+    }    
 
     if (access(configuration_file, F_OK) != -1) {
         airnav_log_level(5, "Configuration file exist and is valid\n");
@@ -195,7 +208,12 @@ void airnav_loadConfig(int argc, char **argv) {
     }
 
 
-    debug_level = ini_getInteger(configuration_file, "client", "debug_level", 0);
+    if (debug_level_cmd == -1) {
+        debug_level = ini_getInteger(configuration_file, "client", "debug_level", 0);
+    } else {
+        debug_level = debug_level_cmd;
+    }        
+    
     log_file = NULL;
     ini_getString(&log_file, configuration_file, "client", "log_file", NULL);
 
@@ -848,7 +866,13 @@ void *airnav_statistics(void *arg) {
     while (!Modes.exit) {
 
         if (local_counter == AIRNV_STATISTICS_INTERVAL) {
-            debug_level = ini_getInteger(configuration_file, "client", "debug_level", 0);
+            
+            if (debug_level_cmd == -1) {
+                debug_level = ini_getInteger(configuration_file, "client", "debug_level", 0);
+            } else {
+                debug_level = debug_level_cmd;
+            }            
+            
             local_counter = 0;
             airnav_log("******** Statistics updated every %d seconds ********\n", AIRNV_STATISTICS_INTERVAL);
             pthread_mutex_lock(&m_packets_counter);
@@ -1822,7 +1846,228 @@ void *airnav_prepareData(void *arg) {
                     }
                     //airnav_log("[%06X] sil: %u\n", (b->addr & 0xffffff), b->sil);
                 }
+                
+                // TAS
+                if (trackDataAge(&b->tas_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_tas_time) >= MAX_TIME_FIELD_TAS) || (b->an.rpisrv_emitted_tas != b->tas)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_tas = b->tas;
+                        b->an.rpisrv_emitted_tas_time = tv.tv_sec;
+
+                        acf->tas = b->tas;
+                        acf->tas_set = 1;
+                                                
+                        airnav_log_level(2, "[%06X] Sending TAS...%u\n", (b->addr & 0xffffff), b->tas);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] TAS is the same for less than %d seconds, will NOT send anything (b->tas: %u, emitted_tas: %u).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TAS, b->tas, b->an.rpisrv_emitted_tas);
+                    }
+
+                }
+                
+                // Track
+                if (trackDataAge(&b->track_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_track_time) >= MAX_TIME_FIELD_TRACK) || (b->an.rpisrv_emitted_track != b->track)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_track = b->track;
+                        b->an.rpisrv_emitted_tas_time = tv.tv_sec;
+
+                        acf->track = b->track;
+                        acf->track_set = 1;
+                                                
+                        airnav_log_level(2, "[%06X] Sending TRACK...%.2f\n", (b->addr & 0xffffff), b->track);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] TRACK is the same for less than %d seconds, will NOT send anything (b->track: %.2f, emitted_track: %.2f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TRACK, b->track, b->an.rpisrv_emitted_track);
+                    }
+
+                }
+                
+                // True heading
+                if (trackDataAge(&b->true_heading_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_true_heading_time) >= MAX_TIME_FIELD_TRUE_HEADING) || (b->an.rpisrv_emitted_true_heading != b->true_heading)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_true_heading = b->true_heading;
+                        b->an.rpisrv_emitted_true_heading_time = tv.tv_sec;
+
+                        acf->true_heading = b->true_heading;
+                        acf->true_heading_set = 1;
+                                                
+                        airnav_log_level(2, "[%06X] Sending True Heading...%.2f\n", (b->addr & 0xffffff), b->true_heading);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] True Heading is the same for less than %d seconds, will NOT send anything (b->true_heading: %.2f, emitted_true_heading: %.2f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TRUE_HEADING, b->true_heading, b->an.rpisrv_emitted_true_heading);
+                    }
+
+                }
+                
+                
+                
+                // MRAR Wind Speed and Dir
+                if (trackDataAge(&b->wind_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_mrar_wind_time) >= MAX_TIME_FIELD_MRAR_WIND) || (b->an.rpisrv_emitted_mrar_wind != b->wind_speed)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_mrar_wind = b->wind_speed;
+                        b->an.rpisrv_emitted_mrar_wind_time = tv.tv_sec;
+
+                        acf->mrar_wind_speed = b->wind_speed;
+                        acf->mrar_wind_speed_set = 1;
+                        
+                        acf->mrar_wind_dir = b->wind_dir;
+                        acf->mrar_wind_dir_set = 1;                        
+                        
+                        airnav_log_level(2, "[%06X] Sending MRAR Wind...Speed: %.2f, dir: %.2f\n", (b->addr & 0xffffff), b->wind_speed, b->wind_dir);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] MRAR Wind is the same for less than %d seconds, will NOT send anything (b->wind_speed: %.2f, emitted_wind_speed: %.2f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_MRAR_WIND, b->wind_speed, b->an.rpisrv_emitted_mrar_wind);
+                    }
+
+                }
+                
+                // MRAR Pressure
+                if (trackDataAge(&b->pressure_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_mrar_pressure_time) >= MAX_TIME_FIELD_MRAR_PRESSURE) || (b->an.rpisrv_emitted_mrar_pressure != b->pressure)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_mrar_pressure = b->pressure;
+                        b->an.rpisrv_emitted_mrar_pressure_time = tv.tv_sec;
+
+                        acf->mrar_pressure = b->pressure;
+                        acf->mrar_pressure_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending MRAR Pressure...%.2f\n", (b->addr & 0xffffff), b->pressure);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] MRAR Pressure is the same for less than %d seconds, will NOT send anything (b->pressure: %.2f, emitted_pressure: %.2f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_MRAR_PRESSURE, b->pressure, b->an.rpisrv_emitted_mrar_pressure);
+                    }
+
+                }
+                
+                
+                // MRAR Temperature
+                if (trackDataAge(&b->temperature_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_mrar_temperature_time) >= MAX_TIME_FIELD_MRAR_TEMPERATURE) || (b->an.rpisrv_emitted_mrar_temperature != b->temperature)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_mrar_temperature = b->temperature;
+                        b->an.rpisrv_emitted_mrar_temperature_time = tv.tv_sec;
+
+                        acf->mrar_temperature = b->temperature;
+                        acf->mrar_temperature_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending MRAR Temperature...%.2f\n", (b->addr & 0xffffff), b->temperature);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] MRAR Temperature is the same for less than %d seconds, will NOT send anything (b->temperature: %.2f, emitted_temperature: %.2f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_MRAR_TEMPERATURE, b->temperature, b->an.rpisrv_emitted_mrar_temperature);
+                    }
+
+                }
+                
+                // MRAR Humidity
+                if (trackDataAge(&b->temperature_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_mrar_humidity_time) >= MAX_TIME_FIELD_MRAR_HUMIDITY) || (b->an.rpisrv_emitted_mrar_humidity != b->humidity)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_mrar_humidity = b->humidity;
+                        b->an.rpisrv_emitted_mrar_humidity_time = tv.tv_sec;
+
+                        acf->mrar_humidity = b->humidity;
+                        acf->mrar_humidity_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending MRAR Humidity...%.2f\n", (b->addr & 0xffffff), b->humidity);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] MRAR Humidity is the same for less than %d seconds, will NOT send anything (b->humidity: %.2f, emitted_humidity: %.2f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_MRAR_HUMIDITY, b->humidity, b->an.rpisrv_emitted_mrar_humidity);
+                    }
+
+                }
+                
+                // MRAR Turbulence
+                if (trackDataAge(&b->turbulence_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_mrar_turbulence_time) >= MAX_TIME_FIELD_MRAR_TURBULENCE) || (b->an.rpisrv_emitted_mrar_turbulence != b->turbulence)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_mrar_turbulence = b->turbulence;
+                        b->an.rpisrv_emitted_mrar_turbulence_time = tv.tv_sec;
+
+                        acf->mrar_turbulence = b->turbulence;
+                        acf->mrar_turbulence_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending MRAR Turbulence...%.2f\n", (b->addr & 0xffffff), b->turbulence);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] MRAR Turbulence is the same for less than %d seconds, will NOT send anything (b->turbulence: %d, emitted_turbulence: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_MRAR_TURBULENCE, b->turbulence, b->an.rpisrv_emitted_mrar_turbulence);
+                    }
+
+                }
+                
+                // ADS-B Version
+                if (b->adsb_version != -1) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_adsb_version_time) >= MAX_TIME_FIELD_ADSB_VERSION) || (b->an.rpisrv_emitted_adsb_version != b->adsb_version)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_adsb_version = b->adsb_version;
+                        b->an.rpisrv_emitted_adsb_version_time = tv.tv_sec;
+
+                        acf->adsb_version = b->adsb_version;
+                        acf->adsb_version_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending ADS-B Version...%d\n", (b->addr & 0xffffff), b->adsb_version);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] ADS-B Version is the same for less than %d seconds, will NOT send anything (b->adsb_version: %d, emitted_adsb_version: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_ADSB_VERSION, b->adsb_version, b->an.rpisrv_emitted_adsb_version);
+                    }
+
+                }
+                
+                // ADS-R Version
+                if (b->adsr_version != -1) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_adsr_version_time) >= MAX_TIME_FIELD_ADSR_VERSION) || (b->an.rpisrv_emitted_adsr_version != b->adsr_version)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_adsr_version = b->adsr_version;
+                        b->an.rpisrv_emitted_adsr_version_time = tv.tv_sec;
+
+                        acf->adsr_version = b->adsr_version;
+                        acf->adsr_version_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending ADS-R Version...%d\n", (b->addr & 0xffffff), b->adsr_version);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] ADS-R Version is the same for less than %d seconds, will NOT send anything (b->adsr_version: %d, emitted_adsr_version: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_ADSR_VERSION, b->adsr_version, b->an.rpisrv_emitted_adsr_version);
+                    }
+
+                }
+                
+                // TIS-B Version
+                if (b->tisb_version != -1) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_tisb_version_time) >= MAX_TIME_FIELD_TISB_VERSION) || (b->an.rpisrv_emitted_tisb_version != b->tisb_version)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_tisb_version = b->tisb_version;
+                        b->an.rpisrv_emitted_tisb_version_time = tv.tv_sec;
+
+                        acf->tisb_version = b->tisb_version;
+                        acf->tisb_version_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending TIS-B Version...%d\n", (b->addr & 0xffffff), b->tisb_version);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] TIS-B Version is the same for less than %d seconds, will NOT send anything (b->tisb_version: %d, emitted_tisb_version: %d).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TISB_VERSION, b->tisb_version, b->an.rpisrv_emitted_tisb_version);
+                    }
+
+                }
+                
+                // Roll
+                if (trackDataAge(&b->roll_valid) <= AIRNAV_MAX_ITEM_AGE) {
+
+                    if (((tv.tv_sec - b->an.rpisrv_emitted_roll_time) >= MAX_TIME_FIELD_ROLL) || (b->an.rpisrv_emitted_roll != b->roll)) { // Send only once every X seconds (or when data changed)
+                        b->an.rpisrv_emitted_roll = b->roll;
+                        b->an.rpisrv_emitted_roll_time = tv.tv_sec;
+
+                        acf->roll = b->roll;
+                        acf->roll_set = 1;                                                
+                        
+                        airnav_log_level(2, "[%06X] Sending Roll...%.2f\n", (b->addr & 0xffffff), b->roll);
+                        send = 1;
+                    } else {
+                        airnav_log_level(2, "[%06X] Roll is the same for less than %d seconds, will NOT send anything (b->roll: %.2f, emitted_roll: %.2f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_ROLL, b->roll, b->an.rpisrv_emitted_roll);
+                    }
+
+                }
 
                 if (send == 1) {
                     airnav_log_level(12, "[Lat:%8.05f,Lon:%8.05f]Hex:%06x CLS:%s HDG:%d ALT:%d GSD:%d VR:%d SQW:%04x IAS:%d AIRBRN: %d\n", acf->lat, acf->lon, acf->modes_addr, acf->callsign, (acf->heading * 10), acf->altitude, (acf->gnd_speed * 10), (acf->vert_rate * 10), acf->squawk, acf->ias, acf->airborne);
