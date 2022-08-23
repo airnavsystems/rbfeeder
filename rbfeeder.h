@@ -153,6 +153,7 @@ extern "C" {
     extern struct termios tty;
     extern int serial_use_att;
     extern int serial_bias_t;
+    extern int serial_old_firmware;
     extern int debug_level_cmd;
     extern char *debug_filter;
     

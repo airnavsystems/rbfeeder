@@ -237,8 +237,9 @@ struct prepared_packet *create_packet_SK_Request(ClientType client_type, char *s
     unsigned len; // Length of serialized data
         
     request.client_type = client_type;
-
     request.serial = serial;    
+    request.client_version = c_version_int;
+    request.has_client_version = 1;
 
     len = request_sk__get_packed_size(&request);
 

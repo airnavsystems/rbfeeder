@@ -21,6 +21,7 @@
 
 void serial_loadSerialConfig(void) {
     ini_getString(&serial_device, configuration_file, "serial", "serial_device", NULL);
+    serial_old_firmware = ini_getBoolean(configuration_file,"serial","old_firmware",0);
     serial_speed = ini_getInteger(configuration_file, "serial", "serial_speed", 921600);
     serial_use_att = ini_getBoolean(configuration_file, "serial", "attenuator", 0);
     serial_bias_t = ini_getBoolean(configuration_file, "serial", "biast", 0);
@@ -185,51 +186,53 @@ void *serial_threadGetSerialData(void *argv) {
         return NULL;
     }
 
-    airnav_log_level(1, "Disabling serial dongle data\n");
-    serial_disableData();
+    if (serial_old_firmware == 0) {
+        airnav_log_level(1, "Disabling serial dongle data\n");
+        serial_disableData();
 
-    // Configue LED and other settings 
-    airnav_log_level(1, "Getting serial dongle FW version.\n");
-    struct sdongle_version *tmp = serial_getDongleVersion(0);
-    if (tmp == NULL) {
-        airnav_log_level(1, "Function to get dongle FW version returned NULL!\n");
-    } else {
-        airnav_log("Serial dongle FW version: %d.%d\n", tmp->major, tmp->minor);
-    }
-
-    int ret = -1;
-    airnav_log_level(1, "Setting serial dongle LED to 3.\n");
-    ret = serial_setLedstatus(3, 0);
-    if (ret != 3) {
-        airnav_log("Error setting serial dongle LED (%d)\n", ret);
-    }
-
-    if (serial_use_att == 1) {
-        airnav_log_level(1, "Setting serial dongle attenuator to ON\n");
-        if (serial_setAttstatus(2, 0) != 2) {
-            airnav_log("Error setting serial dongle attenuator.\n");
+        // Configue LED and other settings 
+        airnav_log_level(1, "Getting serial dongle FW version.\n");
+        struct sdongle_version *tmp = serial_getDongleVersion(0);
+        if (tmp == NULL) {
+            airnav_log_level(1, "Function to get dongle FW version returned NULL!\n");
+        } else {
+            airnav_log("Serial dongle FW version: %d.%d\n", tmp->major, tmp->minor);
         }
-    } else {
-        airnav_log_level(1, "Setting serial dongle attenuator to OFF\n");
-        if (serial_setAttstatus(0, 0) != 0) {
-            airnav_log("Error setting serial dongle attenuator.\n");
-        }
-    }
 
-    if (serial_bias_t == 1) {
-        airnav_log_level(1, "Setting serial dongle Bias-T do ON\n");
-        if (serial_setBiaststatus(1, 0) != 1) {
-            airnav_log("Error setting serial dongle Bias-T.\n");
+        int ret = -1;
+        airnav_log_level(1, "Setting serial dongle LED to 3.\n");
+        ret = serial_setLedstatus(3, 0);
+        if (ret != 3) {
+            airnav_log("Error setting serial dongle LED (%d)\n", ret);
         }
-    } else {
-        airnav_log_level(1, "Setting serial dongle Bias-T do OFF\n");
-        if (serial_setBiaststatus(0, 0) != 0) {
-            airnav_log("Error setting serial dongle Bias-T.\n");
-        }
-    }
 
-    airnav_log_level(1, "Enabling serial dongle data\n");
-    serial_enableData();
+        if (serial_use_att == 1) {
+            airnav_log_level(1, "Setting serial dongle attenuator to ON\n");
+            if (serial_setAttstatus(2, 0) != 2) {
+                airnav_log("Error setting serial dongle attenuator.\n");
+            }
+        } else {
+            airnav_log_level(1, "Setting serial dongle attenuator to OFF\n");
+            if (serial_setAttstatus(0, 0) != 0) {
+                airnav_log("Error setting serial dongle attenuator.\n");
+            }
+        }
+
+        if (serial_bias_t == 1) {
+            airnav_log_level(1, "Setting serial dongle Bias-T do ON\n");
+            if (serial_setBiaststatus(1, 0) != 1) {
+                airnav_log("Error setting serial dongle Bias-T.\n");
+            }
+        } else {
+            airnav_log_level(1, "Setting serial dongle Bias-T do OFF\n");
+            if (serial_setBiaststatus(0, 0) != 0) {
+                airnav_log("Error setting serial dongle Bias-T.\n");
+            }
+        }
+
+        airnav_log_level(1, "Enabling serial dongle data\n");
+        serial_enableData();
+    }
 
     /* simple canonical input */
     do {
@@ -260,18 +263,23 @@ void *serial_threadGetSerialData(void *argv) {
         /* repeat read */
     } while (!Modes.exit);
 
-    // Disable data
-    serial_disableData();
+    if (serial_old_firmware == 0) {
+        // Disable data
+        serial_disableData();
 
-    airnav_log_level(1, "Reseting Serial Dongle options.\n");
-    if (serial_setLedstatus(0, 0) != 0) {
-        airnav_log("Error reseting serial dongle LED status\n");
-    }
-    if (serial_setAttstatus(0, 0) != 0) {
-        airnav_log("Error setting serial dongle attenuator.\n");
-    }
-    if (serial_setBiaststatus(0, 0) != 0) {
-        airnav_log("Error setting serial dongle Bias-T.\n");
+        airnav_log_level(1, "Reseting Serial Dongle options.\n");
+        if (serial_setLedstatus(0, 0) != 0) {
+            airnav_log("Error reseting serial dongle LED status\n");
+        }
+        if (serial_setAttstatus(0, 0) != 0) {
+            airnav_log("Error setting serial dongle attenuator.\n");
+        }
+        if (serial_setBiaststatus(0, 0) != 0) {
+            airnav_log("Error setting serial dongle Bias-T.\n");
+        }
+    
+        serial_enableData();
+        
     }
 
 

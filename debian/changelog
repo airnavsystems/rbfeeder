@@ -19,7 +19,7 @@ rbfeeder (1:1.0.8+deb9) stretch; urgency=medium
   * New command line option: --debug-level (override configuration file).
   * New command line option: --debug-filter <text> to filter debug messages.
 
- --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Mon, 27 Jun 2022 11:00:56 +0300
+ --  Jonis Maurin Ceara <jceara@airnavsystems.com>  Fri, 08 Jul 2022 16:53:56 +0300
 
 rbfeeder (1:1.0.7+deb11) bullseye; urgency=medium
 
