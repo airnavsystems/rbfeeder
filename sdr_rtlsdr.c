@@ -346,7 +346,10 @@ static void rtlsdrCallback(unsigned char *buf, uint32_t len, void *ctx)
 
     // Get the approx system time for the start of this block
     uint64_t block_duration = 1e3 * samples_read / Modes.sample_rate;
-    outbuf->sysTimestamp = mstime() - block_duration;
+    uint64_t block_duration_us = block_duration * 1e3;
+    //outbuf->sysTimestampMonotonicUs = ustime_monotonic() - block_duration_us;
+    outbuf->sysTimestampUs = ustime() - block_duration_us;
+    outbuf->sysTimestamp = outbuf->sysTimestampUs / 1e3;
 
     // Convert the new data
     unsigned to_convert = samples_read;

@@ -3,7 +3,7 @@
  * 
  * https://www.radarbox.com
  * 
- * More info: https://github.com/AirNav-Systems/rbfeeder
+ * More info: https://github.com/airnavsystems/rbfeeder
  * 
  */
 #ifndef AIRNAV_CMD_H

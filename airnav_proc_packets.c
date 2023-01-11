@@ -3,7 +3,7 @@
  * 
  * https://www.radarbox.com
  * 
- * More info: https://github.com/AirNav-Systems/rbfeeder
+ * More info: https://github.com/airnavsystems/rbfeeder
  * 
  */
 #include "airnav_proc_packets.h"
@@ -344,11 +344,15 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
         if (flights->packet->altitude_set == 1) {
             subs[i]->altitude = flights->packet->altitude;
             subs[i]->has_altitude = 1;
+            subs[i]->baro_altitude_timestamp_us = flights->packet->baro_altitude_timestamp_us;
+            subs[i]->has_baro_altitude_timestamp_us = 1;
         }
         
         if (flights->packet->altitude_geo_set == 1) {            
             subs[i]->altitude_geo = flights->packet->altitude_geo;
             subs[i]->has_altitude_geo = 1;
+            subs[i]->geom_altitude_timestamp_us = flights->packet->geom_altitude_timestamp_us;
+            subs[i]->has_geom_altitude_timestamp_us = 1;
         }
 
         if (flights->packet->position_set == 1) {
@@ -356,6 +360,8 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
             subs[i]->longitude = flights->packet->lon;
             subs[i]->has_latitude = 1;
             subs[i]->has_longitude = 1;
+            subs[i]->lat_lon_timestamp_us = flights->packet->lat_lon_timestamp_us;
+            subs[i]->has_lat_lon_timestamp_us = 1;
         }
 
         if (flights->packet->heading_set == 1) {
@@ -542,6 +548,61 @@ void sendMultipleFlights(packet_list *flights, unsigned qtd) {
         if (flights->packet->roll_set == 1) {                        
             subs[i]->roll = flights->packet->roll;
             subs[i]->has_roll = 1;            
+        }
+
+        if (flights->packet->last_timestamp_us != 0) {
+            subs[i]->last_timestamp_us = flights->packet->last_timestamp_us;
+            subs[i]->has_last_timestamp_us = 1;
+        }
+        if (flights->packet->timestamp_source != 0) {
+            subs[i]->timestamp_source = (int)flights->packet->timestamp_source;
+            subs[i]->has_timestamp_source = 1;
+        }
+
+        if (flights->packet->ntp_sync_ok) {
+            subs[i]->ntp_sync_ok = (int)flights->packet->ntp_sync_ok;
+            subs[i]->has_ntp_sync_ok = 1;
+            if (flights->packet->ntp_stratum > 0) {
+                subs[i]->ntp_stratum = (int)flights->packet->ntp_stratum;
+                subs[i]->has_ntp_stratum = 1;
+            }
+            if (flights->packet->ntp_precision != -99) {
+                subs[i]->ntp_precision = (int)flights->packet->ntp_precision;
+                subs[i]->has_ntp_precision = 1;
+            }
+            if (flights->packet->ntp_root_distance_ms != -99) {
+                subs[i]->ntp_root_distance_ms = flights->packet->ntp_root_distance_ms;
+                subs[i]->has_ntp_root_distance_ms = 1;
+            }
+            if (flights->packet->ntp_offset_ms != -99) {
+                subs[i]->ntp_offset_ms = flights->packet->ntp_offset_ms;
+                subs[i]->has_ntp_offset_ms = 1;
+            }
+            if (flights->packet->ntp_delay_ms != -99) {
+                subs[i]->ntp_delay_ms = flights->packet->ntp_delay_ms;
+                subs[i]->has_ntp_delay_ms = 1;
+            }
+            if (flights->packet->ntp_jitter_ms != -99) {
+                subs[i]->ntp_jitter_ms = flights->packet->ntp_jitter_ms;
+                subs[i]->has_ntp_jitter_ms = 1;
+            }
+            if (flights->packet->ntp_frequency_ppm != -99) {
+                subs[i]->ntp_frequency_ppm = flights->packet->ntp_frequency_ppm;
+                subs[i]->has_ntp_frequency_ppm = 1;
+            }
+            airnav_log_level(4, "Sending NTP info: last_wall %lld, last_baro %lld, last_geom %lld, last_latlon %lld, ts_source %d, stratum %d, precision %d, distance %f, offset %f, delay %f, jitter %f, frequency %f\n",
+                    subs[i]->last_timestamp_us,
+                    subs[i]->baro_altitude_timestamp_us,
+                    subs[i]->geom_altitude_timestamp_us,
+                    subs[i]->lat_lon_timestamp_us,
+                    subs[i]->timestamp_source,
+                    subs[i]->ntp_stratum,
+                    subs[i]->ntp_precision,
+                    subs[i]->ntp_root_distance_ms,
+                    subs[i]->ntp_offset_ms,
+                    subs[i]->ntp_delay_ms,
+                    subs[i]->ntp_jitter_ms,
+                    subs[i]->ntp_frequency_ppm);
         }
         
         free(flights->packet);

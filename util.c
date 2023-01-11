@@ -56,6 +56,7 @@
 #include <sys/time.h>
 
 uint64_t _messageNow = 0;
+uint64_t _messageNowUs = 0;
 
 uint64_t mstime(void)
 {
@@ -68,6 +69,28 @@ uint64_t mstime(void)
     return mst;
 }
 
+uint64_t ustime(void)
+{
+    struct timeval tv;
+    uint64_t ust;
+
+    gettimeofday(&tv, NULL);
+    ust = ((uint64_t)tv.tv_sec)*1000000L;
+    ust += tv.tv_usec;
+    return ust;
+}
+
+/*uint64_t ustime_monotonic(void)
+{
+    struct timespec ts;
+    uint64_t ust;
+
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    ust = ((uint64_t)ts.tv_sec)*1000000L;
+    ust += ts.tv_nsec / 1000L;
+    return ust;
+}*/
+
 int64_t receiveclock_ns_elapsed(uint64_t t1, uint64_t t2)
 {
     return (t2 - t1) * 1000U / 12U;
@@ -76,6 +99,11 @@ int64_t receiveclock_ns_elapsed(uint64_t t1, uint64_t t2)
 int64_t receiveclock_ms_elapsed(uint64_t t1, uint64_t t2)
 {
     return (t2 - t1) / 12000U;
+}
+
+int64_t receiveclock_us_elapsed(uint64_t t1, uint64_t t2)
+{
+    return (t2 - t1) / 12U;
 }
 
 void normalize_timespec(struct timespec *ts)

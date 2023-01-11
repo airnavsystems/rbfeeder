@@ -48,6 +48,8 @@
 //   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "dump1090.h"
+#include "airnav_ntp_status.h"
+#include "airnav_utils.h"
 #include <inttypes.h>
 
 /* #define DEBUG_CPR_CHECKS */
@@ -171,6 +173,8 @@ static int accept_data(data_validity *d, datasource_t source)
 
     d->source = source;
     d->updated = messageNow();
+    d->updatedUs = _messageNowUs;
+    //d->updatedMonotonicUs = _messageNowMonotonicUs;
     d->stale = messageNow() + (d->stale_interval ? d->stale_interval : 60000);
     d->expires = messageNow() + (d->expire_interval ? d->expire_interval : 70000);
     return 1;
@@ -190,6 +194,7 @@ static void combine_validity(data_validity *to, const data_validity *from1, cons
 
     to->source = (from1->source < from2->source) ? from1->source : from2->source;        // the worse of the two input sources
     to->updated = (from1->updated > from2->updated) ? from1->updated : from2->updated;   // the *later* of the two update times
+    to->updatedUs = (from1->updatedUs > from2->updatedUs) ? from1->updatedUs : from2->updatedUs;   // the *later* of the two update times
     to->stale = (from1->stale < from2->stale) ? from1->stale : from2->stale;             // the earlier of the two stale times
     to->expires = (from1->expires < from2->expires) ? from1->expires : from2->expires;   // the earlier of the two expiry times
 }
@@ -935,6 +940,9 @@ struct aircraft *trackUpdateFromMessage(struct modesMessage *mm)
     }
 
     _messageNow = mm->sysTimestampMsg;
+    _messageNowUs = mm->sysTimestampMsgUs;
+    //_messageNowMonotonicUs = mm->sysTimestampMsgMonotonicUs;
+    timestamp_source_t timestampSource = mm->timestampSource;
 
     // Lookup our aircraft or create a new one
     a = trackFindAircraft(mm->addr);
@@ -948,7 +956,24 @@ struct aircraft *trackUpdateFromMessage(struct modesMessage *mm)
         a->signalLevel[a->signalNext] = mm->signalLevel;
         a->signalNext = (a->signalNext + 1) & 7;
     }
+    ntp_status localNtpStatus;
+    ntp_status *globalNtpStatus = ntpStatus_getNtpStatus();
+    if (globalNtpStatus != NULL) {
+        localNtpStatus = *globalNtpStatus;
+        a->an.rpisrv_emitted_ntp_sync_ok = 1;
+        a->an.rpisrv_emitted_ntp_stratum = localNtpStatus.stratum;
+        a->an.rpisrv_emitted_ntp_precision = localNtpStatus.precision;
+        a->an.rpisrv_emitted_ntp_root_distance_ms = localNtpStatus.root_distance_ms;
+        a->an.rpisrv_emitted_ntp_offset_ms = localNtpStatus.offset_ms;
+        a->an.rpisrv_emitted_ntp_delay_ms = localNtpStatus.delay_ms;
+        a->an.rpisrv_emitted_ntp_jitter_ms = localNtpStatus.jitter_ms;
+        a->an.rpisrv_emitted_ntp_frequency_ppm = localNtpStatus.frequency_ppm;
+    } else {
+        a->an.rpisrv_emitted_ntp_sync_ok = 0;
+    }
     a->seen      = messageNow();
+    a->an.rpisrv_emitted_last_timestamp_us = _messageNowUs;
+    a->an.rpisrv_emitted_timestamp_source = timestampSource;
     a->messages++;
 
     // count reliable messages we receive; use them as a metric to

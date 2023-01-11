@@ -60,6 +60,8 @@ struct mag_buf {
 
     uint64_t        sampleTimestamp; // Clock timestamp of the start of this block, 12MHz clock
     uint64_t        sysTimestamp;    // Estimated system time at start of block
+    uint64_t        sysTimestampUs;  // Estimated system time at start of block in microseconds
+    //uint64_t        sysTimestampMonotonicUs; // Estimated monotonic time at start of block in microseconds
 
     mag_buf_flags   flags;           // bitwise flags for this buffer
     double          mean_level;      // Mean of normalized (0..1) signal level

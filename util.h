@@ -26,8 +26,16 @@
 /* Returns system time in milliseconds */
 uint64_t mstime(void);
 
+/* Returns system time in microseconds */
+uint64_t ustime(void);
+
+/* Returns cpu time in microseconds */
+//uint64_t ustime_monotonic(void);
+
 /* Returns the time for the current message we're dealing with */
 extern uint64_t _messageNow;
+extern uint64_t _messageNowUs;
+//extern uint64_t _messageNowMonotonicUs;
 static inline uint64_t messageNow() {
     return _messageNow;
 }
@@ -39,6 +47,9 @@ int64_t receiveclock_ns_elapsed(uint64_t t1, uint64_t t2);
 
 /* Same, in milliseconds */
 int64_t receiveclock_ms_elapsed(uint64_t t1, uint64_t t2);
+
+/* Same, in microseconds */
+int64_t receiveclock_us_elapsed(uint64_t t1, uint64_t t2);
 
 /* Normalize the value in ts so that ts->nsec lies in
  * [0,999999999]

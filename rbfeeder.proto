@@ -90,6 +90,20 @@ message FlightData {
     optional TurbulenceType mrar_turbulence     = 56; // MRAR - Turbulence
     optional double mrar_humidity               = 57; // MRAR - Humidity
     optional double roll                        = 58; // Roll
+
+    optional int64 lat_lon_timestamp_us         = 59;
+    optional int64 baro_altitude_timestamp_us   = 60;
+    optional int64 geom_altitude_timestamp_us   = 61;
+    optional int64 last_timestamp_us            = 62;
+    optional int32 timestamp_source             = 63;
+    optional int32 ntp_stratum                  = 64;
+    optional int32 ntp_precision                = 65;
+    optional float ntp_root_distance_ms         = 66;
+    optional float ntp_offset_ms                = 67;
+    optional float ntp_delay_ms                 = 68;
+    optional float ntp_jitter_ms                = 69;
+    optional float ntp_frequency_ppm            = 70;
+    optional int32 ntp_sync_ok                  = 71;
 }
 
 message FlightPacket {

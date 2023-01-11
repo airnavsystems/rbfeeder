@@ -85,7 +85,8 @@ typedef struct {
     uint64_t expire_interval; /* how long after an update until the data expires */
 
     datasource_t source;     /* where the data came from */
-    uint64_t updated;        /* when it arrived */
+    uint64_t updated;        /* when it arrived, in milliseconds */
+    uint64_t updatedUs;      /* when it arrived, in microseconds */
     uint64_t stale;          /* when it goes stale */
     uint64_t expires;        /* when it expires */
 } data_validity;
@@ -399,6 +400,17 @@ struct aircraft {
         
         hazard_t rpisrv_emitted_mrar_turbulence; //            -"-         MRAR Turbulence
         long  rpisrv_emitted_mrar_turbulence_time;  //
+
+        int64_t rpisrv_emitted_last_timestamp_us;
+        timestamp_source_t rpisrv_emitted_timestamp_source;
+        int8_t rpisrv_emitted_ntp_sync_ok;
+        int8_t rpisrv_emitted_ntp_stratum;
+        int8_t rpisrv_emitted_ntp_precision;
+        float rpisrv_emitted_ntp_root_distance_ms;
+        float rpisrv_emitted_ntp_offset_ms;
+        float rpisrv_emitted_ntp_delay_ms;
+        float rpisrv_emitted_ntp_jitter_ms;
+        float rpisrv_emitted_ntp_frequency_ppm;
 
         uint64_t rpisrv_last_emitted; // time (millis) aircraft was last emitted
         uint64_t rpisrv_last_force_emit; // time (millis) we last emitted only-on-change data

@@ -48,6 +48,7 @@
 //   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "dump1090.h"
+#include "airnav_utils.h"
 
 /* for PRIX64 */
 #include <inttypes.h>
@@ -1212,6 +1213,7 @@ static int decodeBinMessage(struct client *c, char *p) {
     unsigned char msg[MODES_LONG_MSG_BYTES + 7];
     static struct modesMessage zeroMessage;
     struct modesMessage mm;
+    //static int64_t smallestTimestampDifference = 0;
     MODES_NOTUSED(c);
     memset(&mm, 0, sizeof(mm));
 
@@ -1257,8 +1259,20 @@ static int decodeBinMessage(struct client *c, char *p) {
             if (0x1A == ch) {p++;}
         }
 
-        // record reception time as the time we read it.
-        mm.sysTimestampMsg = mstime();
+        //uint64_t currentCpuTimestamp = ustime_monotonic();
+        //uint64_t convertedMlatTimestamp = (uint64_t)(((double)mm.timestampMsg) / 1073741824.0 * 100000000.0);
+        //int64_t difference = currentCpuTimestamp - convertedMlatTimestamp;
+        //if (smallestTimestampDifference == 0 || difference < smallestTimestampDifference) {
+        //    smallestTimestampDifference = difference;
+        //}
+
+        //mm.sysTimestampMsgMonotonicUs = currentCpuTimestamp; //convertedMlatTimestamp; // + smallestTimestampDifference;
+        mm.sysTimestampMsgUs = ustime(); // - (currentCpuTimestamp - mm.sysTimestampMsgMonotonicUs);
+        mm.sysTimestampMsg =  mm.sysTimestampMsgUs / 1e3;
+        mm.timestampSource = TIMESTAMP_SOURCE_REMOTE_BEAST_MLAT_TIMESTAMP;
+
+        //airnav_log_level(5, "Got message from network with convertedMlatTimestamp %lld us, difference %lld us, smallest diff %lld\n",
+        //        convertedMlatTimestamp, difference, smallestTimestampDifference);
 
         ch = *p++;  // Grab the signal level
         mm.signalLevel = ((unsigned char)ch / 255.0);
@@ -1707,6 +1721,7 @@ char *generateAircraftJson(const char *url_path, int *len) {
     MODES_NOTUSED(url_path);
 
     _messageNow = now;
+    _messageNowUs = 0;
 
     p = safe_snprintf(p, end,
                        "{ \"now\" : %.1f,\n"

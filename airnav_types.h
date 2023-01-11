@@ -3,7 +3,7 @@
  * 
  * https://www.radarbox.com
  * 
- * More info: https://github.com/AirNav-Systems/rbfeeder
+ * More info: https://github.com/airnavsystems/rbfeeder
  * 
  */
 #ifndef AIRNAV_TYPES_H
@@ -147,7 +147,20 @@ extern "C" {
         int32_t tisb_version;
         short tisb_version_set;
 
-        
+        int64_t lat_lon_timestamp_us;
+        int64_t baro_altitude_timestamp_us;
+        int64_t geom_altitude_timestamp_us;
+        int64_t last_timestamp_us;
+        int8_t timestamp_source;
+        int8_t ntp_sync_ok;
+        int8_t ntp_stratum;
+        int8_t ntp_precision;
+        float ntp_root_distance_ms;
+        float ntp_offset_ms;
+        float ntp_delay_ms;
+        float ntp_jitter_ms;
+        float ntp_frequency_ppm;
+
     } p_data;
 
     typedef struct packet_list {

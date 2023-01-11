@@ -259,6 +259,12 @@ typedef enum {
    HAZARD_SEVERE = 3
 } hazard_t;
 
+typedef enum {
+   TIMESTAMP_SOURCE_UNKNOWN = 0,
+   TIMESTAMP_SOURCE_SYSTEM = 1,
+   TIMESTAMP_SOURCE_REMOTE_BEAST_MLAT_TIMESTAMP = 2
+} timestamp_source_t;
+
 #define MODES_NON_ICAO_ADDRESS       (1<<24) // Set on addresses to indicate they are not ICAO addresses
 
 #define MODES_INTERACTIVE_REFRESH_TIME 250      // Milliseconds
@@ -450,7 +456,9 @@ struct modesMessage {
     uint32_t      addr;                           // Address Announced
     addrtype_t    addrtype;                       // address format / source
     uint64_t      timestampMsg;                   // Timestamp of the message (12MHz clock)
-    uint64_t      sysTimestampMsg;                // Timestamp of the message (system time)
+    uint64_t      sysTimestampMsg;                // Timestamp of the message (system time, in milliseconds)
+    uint64_t      sysTimestampMsgUs;              // Timestamp of the message (system time, in microseconds)
+    timestamp_source_t timestampSource;           // Source of the timestamp (system, remote Beast MLAT timestamp, etc)
     int           remote;                         // If set this message is from a remote station
     double        signalLevel;                    // RSSI, in the range [0..1], as a fraction of full-scale power
     int           score;                          // Scoring from scoreModesMessage, if used
@@ -683,6 +691,8 @@ void  interactiveNoConnection(void);
 
 // Provided by dump1090.c / view1090.c / faup1090.c
 void receiverPositionChanged(float lat, float lon, float alt);
+
+int dump1090_main(int argc, char **argv);
 
 #ifdef __cplusplus
 }

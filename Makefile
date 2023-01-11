@@ -179,7 +179,7 @@ else
     CPPFLAGS += -DSTARCH_MIX_GENERIC
   endif
 endif
-all: proto showconfig dump1090-rb starch-benchmark rbfeeder
+all: proto showconfig starch-benchmark rbfeeder
 
 STARCH_COMPILE := $(CC) $(CPPFLAGS) $(CFLAGS) -c
 include dsp/generated/makefile.$(STARCH_MIX)
@@ -199,12 +199,12 @@ showconfig:
 %.o: %.c *.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-dump1090-rb: dump1090.o anet.o interactive.o mode_ac.o mode_s.o comm_b.o net_io.o crc.o demod_2400.o stats.o cpr.o icao_filter.o track.o util.o convert.o ais_charset.o adaptive.o $(SDR_OBJ) $(COMPAT) $(CPUFEATURES_OBJS) $(STARCH_OBJS)
+#dump1090-rb: dump1090.o anet.o interactive.o mode_ac.o mode_s.o comm_b.o net_io.o crc.o demod_2400.o stats.o cpr.o icao_filter.o track.o util.o convert.o ais_charset.o adaptive.o $(SDR_OBJ) $(COMPAT) $(CPUFEATURES_OBJS) $(STARCH_OBJS)
+#	$(CC) -g -o $@ $^ $(LDFLAGS) $(LIBS) $(LIBS_SDR) $(LIBS_CURSES)
+
+
+rbfeeder: anet.o interactive.o mode_ac.o mode_s.o comm_b.o net_io.o crc.o demod_2400.o stats.o cpr.o icao_filter.o track.o util.o convert.o ais_charset.o adaptive.o airnav_geomag.o airnav_anrb.o airnav_uat.o airnav_dumprb.o airnav_acars.o airnav_mlat.o airnav_vhf.o airnav_cmd.o airnav_proc_packets.o airnav_sk.o airnav_net.o airnav_asterix.o airnav_rtlpower.o airnav_utils.o airnav_main.o crc.o icao_filter.o mode_ac.o net_io.o util.o anet.o mode_s.o comm_b.o ais_charset.o track.o cpr.o stats.o convert.o rbfeeder.o rbfeeder.pb-c.o airnav_scom.o airnav_ntp_status.o $(SDR_OBJ) $(COMPAT) $(CPUFEATURES_OBJS) $(STARCH_OBJS)
 	$(CC) -g -o $@ $^ $(LDFLAGS) $(LIBS) $(LIBS_SDR) $(LIBS_CURSES)
-
-
-rbfeeder: airnav_geomag.o airnav_anrb.o airnav_uat.o airnav_dumprb.o airnav_acars.o airnav_mlat.o airnav_vhf.o airnav_cmd.o airnav_proc_packets.o airnav_sk.o airnav_net.o airnav_asterix.o airnav_rtlpower.o airnav_utils.o airnav_main.o crc.o icao_filter.o mode_ac.o net_io.o util.o anet.o mode_s.o comm_b.o ais_charset.o track.o cpr.o stats.o convert.o rbfeeder.o rbfeeder.pb-c.o airnav_scom.o $(SDR_OBJ) $(COMPAT) $(CPUFEATURES_OBJS) $(STARCH_OBJS)
-	$(CC) -g -o $@ $^ $(LDFLAGS) $(LIBS) $(LIBS_SDR)
 
 
 starch-benchmark: cpu.o dsp/helpers/tables.o $(CPUFEATURES_OBJS) $(STARCH_OBJS) $(STARCH_BENCHMARK_OBJ)

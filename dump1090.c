@@ -591,7 +591,7 @@ static void applyNetDefaults()
         Modes.net_output_beast_ports = strdup("30005");
 }
 
-int main(int argc, char **argv) {
+int dump1090_main(int argc, char **argv) {
     int j;
 
     // Set sane defaults

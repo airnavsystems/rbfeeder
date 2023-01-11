@@ -366,7 +366,9 @@ void demodulate2400(struct mag_buf *mag)
         mm.timestampMsg = mag->sampleTimestamp + j*5 + (8 + 56) * 12 + bestphase;
 
         // compute message receive time as block-start-time + difference in the 12MHz clock
-        mm.sysTimestampMsg = mag->sysTimestamp + receiveclock_ms_elapsed(mag->sampleTimestamp, mm.timestampMsg);
+        mm.sysTimestampMsgUs = mag->sysTimestampUs + receiveclock_us_elapsed(mag->sampleTimestamp, mm.timestampMsg);
+        mm.sysTimestampMsg = mm.sysTimestampMsgUs / 1000;
+        //mm.sysTimestampMsgMonotonicUs = mag->sysTimestampMonotonicUs + receiveclock_us_elapsed(mag->sampleTimestamp, mm.timestampMsg);
 
         mm.score = bestscore;
 
@@ -713,7 +715,10 @@ void demodulate2400AC(struct mag_buf *mag)
         mm.timestampMsg = mag->sampleTimestamp + f2_clock / 5;  // 60MHz -> 12MHz
 
         // compute message receive time as block-start-time + difference in the 12MHz clock
-        mm.sysTimestampMsg = mag->sysTimestamp + receiveclock_ms_elapsed(mag->sampleTimestamp, mm.timestampMsg);
+        mm.sysTimestampMsgUs = mag->sysTimestampUs + receiveclock_us_elapsed(mag->sampleTimestamp, mm.timestampMsg);
+        mm.sysTimestampMsg = mm.sysTimestampMsgUs / 1000;
+        //mm.sysTimestampMsgMonotonicUs = mag->sysTimestampMonotonicUs + receiveclock_us_elapsed(mag->sampleTimestamp, mm.timestampMsg);
+        mm.timestampSource = TIMESTAMP_SOURCE_SYSTEM;
 
         decodeModeAMessage(&mm, modeac);
 

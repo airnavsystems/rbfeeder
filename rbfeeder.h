@@ -57,8 +57,8 @@ extern "C" {
 #define MAX_ANRB 10
 #define AIRNV_STATISTICS_INTERVAL 60
 #define AIRNAV_STATS_SEND_TIME 300 // In seconds
-#define AIRNAV_MAX_ITEM_AGE 3000ULL // 3 Seconds - send interval
-#define AIRNAV_SEND_INTERVAL 3 // 3 second
+#define AIRNAV_MAX_ITEM_AGE 2000ULL // 2 Seconds - send interval
+#define AIRNAV_SEND_INTERVAL 2 // 2 second
     // Minimum time for sending each field (if data is the same), in seconds
 #define MAX_TIME_FIELD_ALTITUDE         60
 #define MAX_TIME_FIELD_MAG_HEADING      60
