@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2020 - AirNav Systems
- * 
+ *
  * https://www.radarbox.com
- * 
+ *
  * More info: https://github.com/airnavsystems/rbfeeder
- * 
+ *
  */
 #include "rbfeeder.h"
 #include "airnav_main.h"
@@ -51,7 +51,7 @@ void airnav_loadConfig(int argc, char **argv) {
     short protocol = 0;
     AN_NOTUSED(protocol);
     short protocol_changed = 0;
-    AN_NOTUSED(protocol_changed);    
+    AN_NOTUSED(protocol_changed);
 
 
     // Print version information
@@ -83,21 +83,21 @@ void airnav_loadConfig(int argc, char **argv) {
                     airnav_log("Invalid argument for device (--device).\n");
                     exit(EXIT_FAILURE);
                 }
-                
+
             } else if (!strcmp(argv[j], "--debug-filter") || !strcmp(argv[j], "-df")) {
                 if (argc - 1 > j && argv[j + 1][0] != '-') {
                     debug_filter = strdup(argv[++j]);
-                    airnav_log("Debug filter set to '%s'\n",debug_filter);                
+                    airnav_log("Debug filter set to '%s'\n",debug_filter);
                 } else {
                     airnav_log("Invalid argument for debug filter (--debug-filter).\n");
                     exit(EXIT_FAILURE);
-                }    
-                
+                }
+
             } else if (!strcmp(argv[j], "--debug-level") || !strcmp(argv[j], "-dl")) {
-                                
+
                 debug_level_cmd = atoi(argv[++j]);
-                airnav_log("Debug level set to %d\n",debug_level_cmd);                
-                
+                airnav_log("Debug level set to %d\n",debug_level_cmd);
+
             } else if (!strcmp(argv[j], "--help") || !strcmp(argv[j], "-h")) {
                 airnav_showHelp();
                 exit(EXIT_SUCCESS);
@@ -187,7 +187,7 @@ void airnav_loadConfig(int argc, char **argv) {
 
         }
 
-    }    
+    }
 
     if (access(configuration_file, F_OK) != -1) {
         airnav_log_level(5, "Configuration file exist and is valid\n");
@@ -213,8 +213,8 @@ void airnav_loadConfig(int argc, char **argv) {
         debug_level = ini_getInteger(configuration_file, "client", "debug_level", 0);
     } else {
         debug_level = debug_level_cmd;
-    }        
-    
+    }
+
     log_file = NULL;
     ini_getString(&log_file, configuration_file, "client", "log_file", NULL);
 
@@ -432,8 +432,8 @@ void airnav_loadConfig(int argc, char **argv) {
 
     // MLAT
     mlat_loadMlatConfig();
-    
-    
+
+
 
     // dump1090-rb
     ini_getString(&dumprb_cmd, configuration_file, "client", "dumprb_cmd", NULL);
@@ -474,11 +474,11 @@ void airnav_loadConfig(int argc, char **argv) {
     rfsurvey_dongle = ini_getInteger(configuration_file, "rtl_power", "rfsurvey_dongle", 0);
 
 
-    
+
 
     // dump978
     uat_loadUatConfig();
-    
+
 
 
     // ACARS
@@ -566,7 +566,7 @@ void airnav_loadConfig(int argc, char **argv) {
 
     // Load serial device configuration
     serial_loadSerialConfig();
-    
+
 
 }
 
@@ -670,8 +670,8 @@ void airnav_init_mutex(void) {
         printf("\n mutex init failed\n");
         exit(EXIT_FAILURE);
     }
-    
-    
+
+
     /*
      * Led ADSB Mutex
      */
@@ -720,7 +720,7 @@ void airnav_create_thread(void) {
         // Thread to get serial data
         pthread_create(&t_serial_data, NULL, serial_threadGetSerialData, NULL);
     }
-    
+
     // Thread for ANRB
     pthread_create(&t_anrb, NULL, anrb_threadWaitNewANRB, NULL);
     pthread_create(&t_anrb_send, NULL, anrb_threadSendDataANRB, NULL);
@@ -869,13 +869,13 @@ void *airnav_statistics(void *arg) {
     while (!Modes.exit) {
 
         if (local_counter == AIRNV_STATISTICS_INTERVAL) {
-            
+
             if (debug_level_cmd == -1) {
                 debug_level = ini_getInteger(configuration_file, "client", "debug_level", 0);
             } else {
                 debug_level = debug_level_cmd;
-            }            
-            
+            }
+
             local_counter = 0;
             airnav_log("******** Statistics updated every %d seconds ********\n", AIRNV_STATISTICS_INTERVAL);
             pthread_mutex_lock(&m_packets_counter);
@@ -1233,6 +1233,7 @@ void *airnav_prepareData(void *arg) {
                                 // ANRB
                                 acf2->altitude_geo = b->altitude_geom;
                                 acf2->altitude_geo_set = 1;
+                                acf2->geom_altitude_timestamp_us = b->altitude_geom_valid.updatedUs;
                                 send = 1;
                                 airnav_log_level(3, "[%06X] Sending altitude_geom...%d\n", (b->addr & 0xffffff), b->altitude_geom);
                             } else {
@@ -1281,6 +1282,7 @@ void *airnav_prepareData(void *arg) {
                                 // ANRB
                                 acf2->altitude = b->altitude_baro;
                                 acf2->altitude_set = 1;
+                                acf2->baro_altitude_timestamp_us = b->altitude_baro_valid.updatedUs;
                                 send = 1;
 
 
@@ -1300,7 +1302,7 @@ void *airnav_prepareData(void *arg) {
 
 
                 }
-                                
+
                 // Position
                 if (trackDataAge(&b->position_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1339,13 +1341,13 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_mag_heading_time = tv.tv_sec;
                         b->an.rpisrv_emitted_mag_heading = (b->mag_heading / 10);
 
-                        if (trackDataValid(&b->mag_heading_valid)) {                                                       
-                            //acf->heading = (b->mag_heading / 10);                                                        
+                        if (trackDataValid(&b->mag_heading_valid)) {
+                            //acf->heading = (b->mag_heading / 10);
                             //acf->heading_set = 1;
-                                                        
+
                             acf->heading_full = b->mag_heading;
-                            acf->heading_full_set = 1;                                                        
-                            
+                            acf->heading_full_set = 1;
+
                             // ANRB
                             acf2->heading = (b->mag_heading / 10);
                             acf2->heading_set = 1;
@@ -1396,9 +1398,9 @@ void *airnav_prepareData(void *arg) {
                         airnav_log_level(1,"[%06X] Wind Dir and Speed (MRAR): '%.2f' - '%.2f'\n", (b->addr & 0xffffff), b->wind_dir, b->wind_speed);
                     }
                 }
-                
-                
-                
+
+
+
                 // Calculate air temperature and wind speed/direction
                 if (trackDataValid(&b->mach_valid) && trackDataValid(&b->ias_valid) && trackDataValid(&b->altitude_baro_valid) && trackDataValid(&b->tas_valid)) {
 
@@ -1442,9 +1444,9 @@ void *airnav_prepareData(void *arg) {
                     if ((acf->altitude_set == 1) && (acf->position_set == 1) && (acf->heading_set == 1)) {
 
                         if ((tempC > -90) && (tempC < 100)) { // xTreme range
-                            
+
                             // If we have altitude and location set, we can check if we need to send temperature or not
-                            if (((tv.tv_sec - b->an.rpisrv_emitted_temperature_time) >= MAX_TIME_FIELD_TEMPERATURE) || (b->an.rpisrv_emitted_temperature != (short) tempC)) { //                             
+                            if (((tv.tv_sec - b->an.rpisrv_emitted_temperature_time) >= MAX_TIME_FIELD_TEMPERATURE) || (b->an.rpisrv_emitted_temperature != (short) tempC)) { //
                                 b->an.rpisrv_emitted_temperature = (short) tempC;
                                 b->an.rpisrv_emitted_temperature_time = tv.tv_sec;
 
@@ -1455,7 +1457,7 @@ void *airnav_prepareData(void *arg) {
                             } else {
                                 airnav_log_level(3, "[%06X] Weather temperature is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_TEMPERATURE);
                             }
-                            
+
                         }
 
 
@@ -1528,7 +1530,7 @@ void *airnav_prepareData(void *arg) {
                         } else {
                             airnav_log_level(3, "[%06X] Weather is the same for less than %d seconds, will NOT send anything.\n", (b->addr & 0xffffff), MAX_TIME_FIELD_WIND);
                         }
-                        
+
 
                     } else {
                         airnav_log_level(3, "[%06X] missing parameters for wind calculation: altitude_set: %d; altitude_set: %d; position_set: %d; heading_set: %d;\n", acf->altitude_set, acf->position_set, acf->heading_set);
@@ -1547,14 +1549,14 @@ void *airnav_prepareData(void *arg) {
                         // Update values
                         b->an.rpisrv_emitted_gs_time = tv.tv_sec;
                         b->an.rpisrv_emitted_gs = (b->gs / 10);
-                        
+
 
                         if (trackDataValid(&b->gs_valid)) {
                             //acf->gnd_speed = (b->gs / 10);
                             acf->gnd_speed_full = b->gs;
                             //acf->gnd_speed_set = 1;
-                            acf->gnd_speed_full_set = 1;                                                        
-                            
+                            acf->gnd_speed_full_set = 1;
+
                             // ANRB
                             acf2->gnd_speed = (b->gs / 10);
                             acf2->gnd_speed_set = 1;
@@ -1579,10 +1581,10 @@ void *airnav_prepareData(void *arg) {
 
                             //acf->vert_rate = (b->geom_rate / 10);
                             //acf->vert_rate_set = 1;
-                            
+
                             acf->vert_rate_full = b->geom_rate;
                             acf->vert_rate_full_set = 1;
-                            
+
                             // ANRB
                             acf2->vert_rate = (b->geom_rate / 10);
                             acf2->vert_rate_set = 1;
@@ -1602,10 +1604,10 @@ void *airnav_prepareData(void *arg) {
 
                             //acf->vert_rate = (b->baro_rate / 10);
                             //acf->vert_rate_set = 1;
-                            
+
                             acf->vert_rate_full = b->baro_rate;
                             acf->vert_rate_full_set = 1;
-                            
+
                             // ANRB
                             acf2->vert_rate = (b->baro_rate / 10);
                             acf2->vert_rate_set = 1;
@@ -1652,10 +1654,10 @@ void *airnav_prepareData(void *arg) {
 
                         //acf->ias = (b->ias / 10);
                         //acf->ias_set = 1;
-                        
+
                         acf->ias_full = b->ias;
                         acf->ias_full_set = 1;
-                        
+
                         // ANRB
                         acf2->ias = (b->ias / 10);
                         acf2->ias_set = 1;
@@ -1852,7 +1854,7 @@ void *airnav_prepareData(void *arg) {
                     }
                     //airnav_log("[%06X] sil: %u\n", (b->addr & 0xffffff), b->sil);
                 }
-                
+
                 // TAS
                 if (trackDataAge(&b->tas_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1862,7 +1864,10 @@ void *airnav_prepareData(void *arg) {
 
                         acf->tas = b->tas;
                         acf->tas_set = 1;
-                                                
+
+                        acf2->tas = b->tas;
+                        acf2->tas_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending TAS...%u\n", (b->addr & 0xffffff), b->tas);
                         send = 1;
                     } else {
@@ -1870,7 +1875,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // Track
                 if (trackDataAge(&b->track_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1880,7 +1885,7 @@ void *airnav_prepareData(void *arg) {
 
                         acf->track = b->track;
                         acf->track_set = 1;
-                                                
+
                         airnav_log_level(3, "[%06X] Sending TRACK...%.2f\n", (b->addr & 0xffffff), b->track);
                         send = 1;
                     } else {
@@ -1888,7 +1893,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // True heading
                 if (trackDataAge(&b->true_heading_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1898,7 +1903,7 @@ void *airnav_prepareData(void *arg) {
 
                         acf->true_heading = b->true_heading;
                         acf->true_heading_set = 1;
-                                                
+
                         airnav_log_level(3, "[%06X] Sending True Heading...%.2f\n", (b->addr & 0xffffff), b->true_heading);
                         send = 1;
                     } else {
@@ -1906,9 +1911,9 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
-                
-                
+
+
+
                 // MRAR Wind Speed and Dir
                 if (trackDataAge(&b->wind_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1918,10 +1923,10 @@ void *airnav_prepareData(void *arg) {
 
                         acf->mrar_wind_speed = b->wind_speed;
                         acf->mrar_wind_speed_set = 1;
-                        
+
                         acf->mrar_wind_dir = b->wind_dir;
-                        acf->mrar_wind_dir_set = 1;                        
-                        
+                        acf->mrar_wind_dir_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending MRAR Wind...Speed: %.2f, dir: %.2f\n", (b->addr & 0xffffff), b->wind_speed, b->wind_dir);
                         send = 1;
                     } else {
@@ -1929,7 +1934,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // MRAR Pressure
                 if (trackDataAge(&b->pressure_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1938,8 +1943,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_mrar_pressure_time = tv.tv_sec;
 
                         acf->mrar_pressure = b->pressure;
-                        acf->mrar_pressure_set = 1;                                                
-                        
+                        acf->mrar_pressure_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending MRAR Pressure...%.2f\n", (b->addr & 0xffffff), b->pressure);
                         send = 1;
                     } else {
@@ -1947,8 +1952,8 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
-                
+
+
                 // MRAR Temperature
                 if (trackDataAge(&b->temperature_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1957,8 +1962,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_mrar_temperature_time = tv.tv_sec;
 
                         acf->mrar_temperature = b->temperature;
-                        acf->mrar_temperature_set = 1;                                                
-                        
+                        acf->mrar_temperature_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending MRAR Temperature...%.2f\n", (b->addr & 0xffffff), b->temperature);
                         send = 1;
                     } else {
@@ -1966,7 +1971,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // MRAR Humidity
                 if (trackDataAge(&b->humidity_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1975,8 +1980,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_mrar_humidity_time = tv.tv_sec;
 
                         acf->mrar_humidity = b->humidity;
-                        acf->mrar_humidity_set = 1;                                                
-                        
+                        acf->mrar_humidity_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending MRAR Humidity...%.2f\n", (b->addr & 0xffffff), b->humidity);
                         send = 1;
                     } else {
@@ -1984,7 +1989,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // MRAR Turbulence
                 if (trackDataAge(&b->turbulence_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -1993,8 +1998,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_mrar_turbulence_time = tv.tv_sec;
 
                         acf->mrar_turbulence = b->turbulence;
-                        acf->mrar_turbulence_set = 1;                                                
-                        
+                        acf->mrar_turbulence_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending MRAR Turbulence...%.2f\n", (b->addr & 0xffffff), b->turbulence);
                         send = 1;
                     } else {
@@ -2002,7 +2007,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // ADS-B Version
                 if (b->adsb_version != -1) {
 
@@ -2011,8 +2016,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_adsb_version_time = tv.tv_sec;
 
                         acf->adsb_version = b->adsb_version;
-                        acf->adsb_version_set = 1;                                                
-                        
+                        acf->adsb_version_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending ADS-B Version...%d\n", (b->addr & 0xffffff), b->adsb_version);
                         send = 1;
                     } else {
@@ -2020,7 +2025,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // ADS-R Version
                 if (b->adsr_version != -1) {
 
@@ -2029,8 +2034,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_adsr_version_time = tv.tv_sec;
 
                         acf->adsr_version = b->adsr_version;
-                        acf->adsr_version_set = 1;                                                
-                        
+                        acf->adsr_version_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending ADS-R Version...%d\n", (b->addr & 0xffffff), b->adsr_version);
                         send = 1;
                     } else {
@@ -2038,7 +2043,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // TIS-B Version
                 if (b->tisb_version != -1) {
 
@@ -2047,8 +2052,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_tisb_version_time = tv.tv_sec;
 
                         acf->tisb_version = b->tisb_version;
-                        acf->tisb_version_set = 1;                                                
-                        
+                        acf->tisb_version_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending TIS-B Version...%d\n", (b->addr & 0xffffff), b->tisb_version);
                         send = 1;
                     } else {
@@ -2056,7 +2061,7 @@ void *airnav_prepareData(void *arg) {
                     }
 
                 }
-                
+
                 // Roll
                 if (trackDataAge(&b->roll_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
@@ -2065,8 +2070,8 @@ void *airnav_prepareData(void *arg) {
                         b->an.rpisrv_emitted_roll_time = tv.tv_sec;
 
                         acf->roll = b->roll;
-                        acf->roll_set = 1;                                                
-                        
+                        acf->roll_set = 1;
+
                         airnav_log_level(3, "[%06X] Sending Roll...%.2f\n", (b->addr & 0xffffff), b->roll);
                         send = 1;
                     } else {
@@ -2078,6 +2083,10 @@ void *airnav_prepareData(void *arg) {
                 acf->last_timestamp_us = b->an.rpisrv_emitted_last_timestamp_us;
                 acf->timestamp_source = (char)b->an.rpisrv_emitted_timestamp_source;
 
+                acf2->last_timestamp_us = b->an.rpisrv_emitted_last_timestamp_us;
+                acf2->timestamp_source = (char)b->an.rpisrv_emitted_timestamp_source;
+
+
                 if (b->an.rpisrv_emitted_ntp_sync_ok) {
                     acf->ntp_sync_ok = 1;
                     acf->ntp_stratum = b->an.rpisrv_emitted_ntp_stratum;
@@ -2087,6 +2096,16 @@ void *airnav_prepareData(void *arg) {
                     acf->ntp_delay_ms = b->an.rpisrv_emitted_ntp_delay_ms;
                     acf->ntp_jitter_ms = b->an.rpisrv_emitted_ntp_jitter_ms;
                     acf->ntp_frequency_ppm = b->an.rpisrv_emitted_ntp_frequency_ppm;
+
+                    acf2->ntp_sync_ok = 1;
+                    acf2->ntp_stratum = b->an.rpisrv_emitted_ntp_stratum;
+                    acf2->ntp_precision = b->an.rpisrv_emitted_ntp_precision;
+                    acf2->ntp_root_distance_ms = b->an.rpisrv_emitted_ntp_root_distance_ms;
+                    acf2->ntp_offset_ms = b->an.rpisrv_emitted_ntp_offset_ms;
+                    acf2->ntp_delay_ms = b->an.rpisrv_emitted_ntp_delay_ms;
+                    acf2->ntp_jitter_ms = b->an.rpisrv_emitted_ntp_jitter_ms;
+                    acf2->ntp_frequency_ppm = b->an.rpisrv_emitted_ntp_frequency_ppm;
+
                     airnav_log_level(5, "Copied NTP info from aircraft to p_data: last_wall %lld, ts_source %hhd, stratum %hhd, precision %hhd, distance %f, offset %f, delay %f, jitter %f, frequency %f\n",
                             acf->last_timestamp_us,
                             acf->timestamp_source,
@@ -2099,6 +2118,7 @@ void *airnav_prepareData(void *arg) {
                             acf->ntp_frequency_ppm);
                 } else {
                     acf->ntp_sync_ok = 0;
+                    acf2->ntp_sync_ok = 0;
                 }
 
                 if (send == 1) {
