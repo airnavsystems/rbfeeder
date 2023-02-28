@@ -149,6 +149,8 @@ void cmd_proccess_ctr_cmd_packet(uint8_t *packet, unsigned p_size) {
             if (ctr_cmd->has_device) {
                 rfsurvey_dongle = ctr_cmd->device;
             }
+            memset(rfsurvey_key,0,501);
+            strcpy(rfsurvey_key,ctr_cmd->value);
             rfsurvey_execute = 1;
 
         }

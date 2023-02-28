@@ -52,7 +52,7 @@ int rtlpower_checkRtlpowerRunning(void) {
  * Start RTL_power, if not running
  */
 void rtlpower_startRtlpower(void) {
-/*
+
     if (rtlpower_checkRtlpowerRunning() != 0) {
         airnav_log_level(3, "Looks like rtl_power is already running.\n");
         return;
@@ -83,7 +83,7 @@ void rtlpower_startRtlpower(void) {
     } else {
         airnav_log_level(3, "Error starting rtl_power\n");
     }
-*/
+
     return;
 }
 

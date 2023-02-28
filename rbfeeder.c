@@ -470,6 +470,10 @@ int main(int argc, char **argv) {
             if (dumprb_checkDumprbRunning() == 0) {
                 doRtlPower();
             }
+            
+            if (rtlpower_checkRtlpowerRunning() == 0) {
+                connectData();
+            }
 
         } else {
 
