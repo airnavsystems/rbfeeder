@@ -508,10 +508,10 @@ int main(int argc, char **argv) {
 
             
             } else { // Serial device - Just spend some time
-                while (Modes.exit != 1) {
+                //while (Modes.exit != 1) {
                     sleep(1);
                     // Taking some time...
-                }
+                //}
             }
 
 
