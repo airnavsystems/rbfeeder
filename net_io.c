@@ -1454,7 +1454,9 @@ static int decodeHexMessage(struct client *c, char *hex) {
     }
 
     // record reception time as the time we read it.
-    mm.sysTimestampMsg = mstime();
+    mm.sysTimestampMsgUs = ustime(); // - (currentCpuTimestamp - mm.sysTimestampMsgMonotonicUs);
+    mm.sysTimestampMsg =  mm.sysTimestampMsgUs / 1e3;
+    mm.timestampSource = TIMESTAMP_SOURCE_REMOTE_BEAST_MLAT_TIMESTAMP;
 
     if (l == (MODEAC_MSG_BYTES * 2)) {  // ModeA or ModeC
         Modes.stats_current.remote_received_modeac++;
