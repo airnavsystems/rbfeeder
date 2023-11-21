@@ -479,6 +479,13 @@ int main(int argc, char **argv) {
 
             if (serial_device == NULL) {                
             
+                if (!net_mode) {
+                    bool dumpRbRunning = dumprb_checkDumprbRunning();
+                    if (!dumpRbRunning) {
+                        airnav_log_level(2, "dump1090 doesn't seem to be running. Resetting connection...\n");
+                        c = NULL;
+                    }
+                }
                 while (!c && Modes.exit != 1) {
                     struct timespec r2 = {3, 0};
                     nanosleep(&r2, NULL);
