@@ -1104,19 +1104,26 @@ void *airnav_prepareData(void *arg) {
 
                     // Check conditions that force data to be sent
 
-                    // Speed less than 50
-                    if (trackDataValid(&b->gs_valid) && b->gs <= 50) {
+                    // Do not restrict ground speeds
+                    if (trackDataValid(&b->gs_valid)) {
                         force_send = 1;
-                        airnav_log_level(2, "[%06X, Callsign '%s'] Speed <= 50, force send.\n", (b->addr & 0xffffff), b->callsign);
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Speed is valid, force send.\n", (b->addr & 0xffffff), b->callsign);
                     }
 
-                    // Altitude < 3000
-                    if (trackDataValid(&b->altitude_geom_valid) && b->altitude_geom <= 3000) {
+                    // Do not restrict headings
+                    if (trackDataValid(&b->mag_heading_valid)) {
                         force_send = 1;
-                        airnav_log_level(2, "[%06X, Callsign '%s'] Altitude (geometric) <= 3000, force send.\n", (b->addr & 0xffffff), b->callsign);
-                    } else if (trackDataValid(&b->altitude_baro_valid) && b->altitude_baro <= 3000) {
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Heading is valid, force send.\n", (b->addr & 0xffffff), b->callsign);
+                    }
+
+
+                    // Do not restrict altitudes
+                    if (trackDataValid(&b->altitude_geom_valid)) {
                         force_send = 1;
-                        airnav_log_level(2, "[%06X, Callsign '%s'] Altitude (barometric) < 3000, force send.\n", (b->addr & 0xffffff), b->callsign);
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Altitude (geometric) is valid, force send.\n", (b->addr & 0xffffff), b->callsign);
+                    } else if (trackDataValid(&b->altitude_baro_valid)) {
+                        force_send = 1;
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Altitude (barometric) is valid, force send.\n", (b->addr & 0xffffff), b->callsign);
                     }
 
                     // Airborne = Ground
@@ -1125,31 +1132,20 @@ void *airnav_prepareData(void *arg) {
                         airnav_log_level(2, "[%06X, Callsign '%s'] Airborne = GROUND, force send. Altitude (baro): %d, Altitude (geom): %d\n", (b->addr & 0xffffff), b->callsign, b->altitude_baro, b->altitude_geom);
                     }
 
-
-                    // (vertical_rate > 1000 && altitude < 10000)
-                    if (trackDataValid(&b->geom_rate_valid) && b->geom_rate >= 1000) {
-                        // Now, check altitude
-                        if (trackDataValid(&b->altitude_geom_valid) && b->altitude_geom <= 10000) {
-                            force_send = 1;
-                            airnav_log_level(2, "[%06X, Callsign '%s'] Geometric rate > 1000 and altitude (geom) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
-                        } else if (trackDataValid(&b->altitude_baro_valid) && b->altitude_baro <= 10000) {
-                            force_send = 1;
-                            airnav_log_level(2, "[%06X, Callsign '%s'] Geometric rate > 1000 and altitude (baro) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
-                        }
-                    } else if (trackDataValid(&b->baro_rate_valid) && b->baro_rate >= 1000) {
-                        // Now, check altitude
-                        if (trackDataValid(&b->altitude_geom_valid) && b->altitude_geom <= 10000) {
-                            force_send = 1;
-                            airnav_log_level(2, "[%06X, Callsign '%s'] Baro rate > 1000 and altitude (geom) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
-                        } else if (trackDataValid(&b->altitude_baro_valid) && b->altitude_baro <= 10000) {
-                            force_send = 1;
-                            airnav_log_level(2, "[%06X, Callsign '%s'] Baro rate > 1000 and altitude (baro) < 7000, force send.\n", (b->addr & 0xffffff), b->callsign);
-                        }
+                    if (trackDataValid(&b->callsign_valid)) {
+                        force_send = 1;
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Callsign is valid, force send. \n", (b->addr & 0xffffff), b->callsign);
                     }
 
 
-
-
+                    // Do not restrict vertical rates
+                    if (trackDataValid(&b->geom_rate_valid)) {
+                        force_send = 1;
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Geometric rate is valid, force send.\n", (b->addr & 0xffffff), b->callsign);
+                    } else if (trackDataValid(&b->baro_rate_valid)) {
+                        force_send = 1;
+                        airnav_log_level(2, "[%06X, Callsign '%s'] Baro rate is valid, force send.\n", (b->addr & 0xffffff), b->callsign);
+                    }
                 }
 
                 acf->timestp = now;
@@ -1159,7 +1155,7 @@ void *airnav_prepareData(void *arg) {
                 // Check if Callsign updated
                 if (trackDataAge(&b->callsign_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
-                    if (((tv.tv_sec - b->an.rpisrv_emitted_callsign_time) >= MAX_TIME_FIELD_CALLSIGN) || (strcmp(b->callsign, b->an.rpisrv_emitted_callsign) != 0) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
+                    if (force_send == 1 || ((tv.tv_sec - b->an.rpisrv_emitted_callsign_time) >= MAX_TIME_FIELD_CALLSIGN) || (strcmp(b->callsign, b->an.rpisrv_emitted_callsign) != 0) ) { // Send only once every 60 seconds (or when data changed)
                         strcpy(b->an.rpisrv_emitted_callsign, b->callsign);
                         b->an.rpisrv_emitted_callsign_time = tv.tv_sec;
 
@@ -1187,7 +1183,7 @@ void *airnav_prepareData(void *arg) {
                 // Check if Alt updated
                 if (trackDataValid(&b->airground_valid) && b->airground == AG_GROUND && b->airground_valid.source >= SOURCE_MODE_S_CHECKED) {
 
-                    if (((tv.tv_sec - b->an.rpisrv_emitted_airborne_time) >= MAX_TIME_FIELD_AIRBORNE) || (b->an.rpisrv_emitted_airborne != 0) || force_send == 1) { // Send only once every X seconds (or when data changed)
+                    if (force_send == 1 || ((tv.tv_sec - b->an.rpisrv_emitted_airborne_time) >= MAX_TIME_FIELD_AIRBORNE) || (b->an.rpisrv_emitted_airborne != 0) ) { // Send only once every X seconds (or when data changed)
                         b->an.rpisrv_emitted_airborne_time = tv.tv_sec;
                         b->an.rpisrv_emitted_airborne = 0;
                         acf->airborne = 0;
@@ -1206,7 +1202,7 @@ void *airnav_prepareData(void *arg) {
 
 
                     if (Modes.use_gnss && trackDataValid(&b->altitude_geom_valid)) {
-                        if (trackDataAge(&b->altitude_geom_valid) <= AIRNAV_MAX_ITEM_AGE) {
+                        if (force_send == 1 || trackDataAge(&b->altitude_geom_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
                             if (((tv.tv_sec - b->an.rpisrv_emitted_altitude_geom_time) >= MAX_TIME_FIELD_ALTITUDE) || (b->an.rpisrv_emitted_altitude_geom != b->altitude_geom) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
                                 b->an.rpisrv_emitted_altitude_geom_time = tv.tv_sec;
@@ -1251,7 +1247,7 @@ void *airnav_prepareData(void *arg) {
                     // Altitude barometric
                     if (trackDataValid(&b->altitude_baro_valid)) {
 
-                        if (trackDataAge(&b->altitude_baro_valid) <= AIRNAV_MAX_ITEM_AGE) {
+                        if (force_send == 1 || trackDataAge(&b->altitude_baro_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
 
                             if (((tv.tv_sec - b->an.rpisrv_emitted_altitude_baro_time) >= MAX_TIME_FIELD_ALTITUDE) || (b->an.rpisrv_emitted_altitude_baro != b->altitude_baro) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
@@ -1327,7 +1323,7 @@ void *airnav_prepareData(void *arg) {
                 // Heading
                 if (trackDataAge(&b->mag_heading_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
-                    if (((tv.tv_sec - b->an.rpisrv_emitted_mag_heading_time) >= MAX_TIME_FIELD_MAG_HEADING) || (b->an.rpisrv_emitted_mag_heading != (b->mag_heading / 10))) { // Send only once every 60 seconds (or when data changed)
+                    if (force_send == 1 || ((tv.tv_sec - b->an.rpisrv_emitted_mag_heading_time) >= MAX_TIME_FIELD_MAG_HEADING) || (b->an.rpisrv_emitted_mag_heading != (b->mag_heading / 10))) { // Send only once every 60 seconds (or when data changed)
 
                         // Update values
                         b->an.rpisrv_emitted_mag_heading_time = tv.tv_sec;
@@ -1536,7 +1532,7 @@ void *airnav_prepareData(void *arg) {
 
                 if (trackDataAge(&b->gs_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
-                    if (((tv.tv_sec - b->an.rpisrv_emitted_gs_time) >= MAX_TIME_FIELD_GS) || (b->an.rpisrv_emitted_gs != (b->gs / 10)) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
+                    if (force_send == 1 || ((tv.tv_sec - b->an.rpisrv_emitted_gs_time) >= MAX_TIME_FIELD_GS) || (b->an.rpisrv_emitted_gs != (b->gs / 10))) { // Send only once every 60 seconds (or when data changed)
 
                         // Update values
                         b->an.rpisrv_emitted_gs_time = tv.tv_sec;
@@ -1560,12 +1556,11 @@ void *airnav_prepareData(void *arg) {
                         airnav_log_level(2, "[%06X] Gnd_speed is the same for less than %d seconds, will NOT send anything (b->gs: %.0f, emitted_gs: %.0f).\n", (b->addr & 0xffffff), MAX_TIME_FIELD_GS, (b->gs / 10), b->an.rpisrv_emitted_gs);
                     }
 
-
                 }
 
                 // Check vertical rate
                 if (Modes.use_gnss && trackDataValid(&b->geom_rate_valid)) {
-                    if (trackDataAge(&b->geom_rate_valid) <= AIRNAV_MAX_ITEM_AGE) {
+                    if (force_send == 1 || trackDataAge(&b->geom_rate_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
                         if (((tv.tv_sec - b->an.rpisrv_emitted_geom_rate_time) >= MAX_TIME_FIELD_GEOM_RATE) || (b->an.rpisrv_emitted_geom_rate != (b->geom_rate / 10)) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
                             b->an.rpisrv_emitted_geom_rate = (b->geom_rate / 10);
@@ -1588,7 +1583,7 @@ void *airnav_prepareData(void *arg) {
 
                     }
                 } else if (trackDataValid(&b->baro_rate_valid)) {
-                    if (trackDataAge(&b->baro_rate_valid) <= AIRNAV_MAX_ITEM_AGE) {
+                    if (force_send == 1 || trackDataAge(&b->baro_rate_valid) <= AIRNAV_MAX_ITEM_AGE) {
 
                         if (((tv.tv_sec - b->an.rpisrv_emitted_baro_rate_time) >= MAX_TIME_FIELD_BARO_RATE) || (b->an.rpisrv_emitted_baro_rate != (b->baro_rate / 10)) || force_send == 1) { // Send only once every 60 seconds (or when data changed)
                             b->an.rpisrv_emitted_baro_rate = (b->baro_rate / 10);

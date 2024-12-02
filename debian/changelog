@@ -1,3 +1,9 @@
+rbfeeder (1:1.0.12) UNRELEASED; urgency=medium
+
+  * Always publish positional parameter updates (not only when they change)
+
+ -- ncovas <ncovas@airnavsystems.com>  Tue, 22 Oct 2024 17:48:08 +0100
+
 rbfeeder (1:1.0.8+deb9) stretch; urgency=medium
 
   * Fix altitude wrong value.

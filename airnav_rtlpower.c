@@ -177,10 +177,10 @@ int rtlpower_curl_send_rtlpower(char *url, char *username, char *userpwd, char *
         curl_easy_setopt(curl, CURLOPT_READDATA, (void *) &hd);
 
         /* set the ioctl function */
-        curl_easy_setopt(curl, CURLOPT_IOCTLFUNCTION, rtlpower_my_ioctl);
+        curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, rtlpower_my_ioctl);
 
         /* pass the file descriptor to the ioctl callback as well */
-        curl_easy_setopt(curl, CURLOPT_IOCTLDATA, (void *) &hd);
+        curl_easy_setopt(curl, CURLOPT_SEEKDATA, (void *) &hd);
 
         /* enable "uploading" (which means PUT when doing HTTP) */
         curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
